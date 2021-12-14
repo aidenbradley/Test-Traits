@@ -78,37 +78,37 @@ trait MakesHttpRequests
 
     public function assertOk(): void
     {
-        $this->assertEquals(Response::HTTP_OK, $this->response->getStatusCode());
+        static::assertEquals(Response::HTTP_OK, $this->response->getStatusCode());
     }
 
     public function assertNotFound(): void
     {
-        $this->assertEquals(Response::HTTP_NOT_FOUND, $this->response->getStatusCode());
+        static::assertEquals(Response::HTTP_NOT_FOUND, $this->response->getStatusCode());
     }
 
     public function assertNoContent(): void
     {
-        $this->assertEquals(Response::HTTP_NO_CONTENT, $this->response->getStatusCode());
+        static::assertEquals(Response::HTTP_NO_CONTENT, $this->response->getStatusCode());
     }
 
     public function assertUnprocessable(): void
     {
-        $this->assertEquals(Response::HTTP_UNPROCESSABLE_ENTITY, $this->response->getStatusCode());
+        static::assertEquals(Response::HTTP_UNPROCESSABLE_ENTITY, $this->response->getStatusCode());
     }
 
     public function assertRedirectedTo(string $uri): void
     {
-        $this->assertEquals($uri, $this->response->headers->get('location'));
+        static::assertEquals($uri, $this->response->headers->get('location'));
     }
 
     public function assertMethodNotAllowed(): void
     {
-        $this->assertEquals(Response::HTTP_METHOD_NOT_ALLOWED, $this->response->getStatusCode());
+        static::assertEquals(Response::HTTP_METHOD_NOT_ALLOWED, $this->response->getStatusCode());
     }
 
     public function assertJsonContent(array $json): void
     {
-        $this->assertEquals($json, json_decode($this->response->getContent()));
+        static::assertEquals($json, json_decode($this->response->getContent()));
     }
 
     public function assertJsonContentContains(array $json): void
@@ -116,7 +116,7 @@ trait MakesHttpRequests
         $decodedResponse = json_decode($this->response->getContent());
 
         foreach ($json as $key => $value) {
-            $this->assertEquals($value, $decodedResponse->{$key});
+            static::assertEquals($value, $decodedResponse->{$key});
         }
     }
 
