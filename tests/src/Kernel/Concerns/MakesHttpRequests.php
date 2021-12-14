@@ -5,7 +5,6 @@ namespace Drupal\Tests\test_traits\Kernel\Concerns;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-/** To be used in KernelTests */
 trait MakesHttpRequests
 {
     /** @var Request */

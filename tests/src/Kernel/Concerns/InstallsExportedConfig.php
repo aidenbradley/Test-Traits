@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\helpers\Concerns\Tests;
+namespace Drupal\Tests\test_traits\Kernel\Concerns;
 
 use Drupal\Core\Config\FileStorage;
 
@@ -46,7 +46,7 @@ trait InstallsExportedConfig
             return substr($storageFieldName, strripos($storageFieldName, '.') + 1);
         }, $configStorage->listAll("field.storage.$entityType")), $entityType, $bundle);
     }
-    
+
     public function installExportedImageStyle(string $imageStyle): void
     {
         $this->installExportedConfig([

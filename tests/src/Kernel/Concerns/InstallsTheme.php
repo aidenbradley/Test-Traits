@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\helpers\Concerns\Tests;
+namespace Drupal\Tests\test_traits\Kernel\Concerns;
 
 /**
  * To be used in KernelTests
