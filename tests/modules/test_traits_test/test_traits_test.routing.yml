@@ -1,0 +1,48 @@
+route.get:
+  path: '/get'
+  defaults:
+    _controller: '\Drupal\test_traits_test\Controller\ResolveRequest'
+  methods: [GET]
+  options:
+    no_cache: TRUE
+  requirements:
+    _access: 'TRUE'
+
+route.post:
+  path: '/post'
+  defaults:
+    _controller: '\Drupal\test_traits_test\Controller\ResolveRequest'
+  methods: [POST]
+  options:
+    no_cache: TRUE
+  requirements:
+    _access: 'TRUE'
+
+route.put:
+  path: '/put'
+  defaults:
+    _controller: '\Drupal\test_traits_test\Controller\ResolveRequest'
+  methods: [PUT]
+  options:
+    no_cache: TRUE
+  requirements:
+    _access: 'TRUE'
+
+route.delete:
+  path: '/delete'
+  defaults:
+    _controller: '\Drupal\test_traits_test\Controller\ResolveRequest'
+  methods: [DELETE]
+  options:
+    no_cache: TRUE
+  requirements:
+    _access: 'TRUE'
+
+route.request_info:
+  path: '/request-info'
+  defaults:
+    _controller: '\Drupal\test_traits_test\Controller\ResolveRequest::requestInfo'
+  options:
+    no_cache: TRUE
+  requirements:
+    _access: 'TRUE'
