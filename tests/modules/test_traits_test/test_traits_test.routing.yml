@@ -46,3 +46,12 @@ route.request_info:
     no_cache: TRUE
   requirements:
     _access: 'TRUE'
+
+route.status_code:
+  path: '/status/{code}'
+  defaults:
+    _controller: '\Drupal\test_traits_test\Controller\ResolveRequest::statusCode'
+  options:
+    no_cache: TRUE
+  requirements:
+    _access: 'TRUE'

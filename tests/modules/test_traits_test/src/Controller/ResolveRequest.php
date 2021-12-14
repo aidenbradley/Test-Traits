@@ -36,4 +36,9 @@ class ResolveRequest implements ContainerInjectionInterface
             'is_ajax' => $this->request->isXmlHttpRequest(),
         ]);
     }
+
+    public function statusCode(string $code): JsonResponse
+    {
+        return JsonResponse::create('Content', (int) $code);
+    }
 }

@@ -2,42 +2,47 @@
 
 namespace Drupal\Tests\test_traits\Kernel\Concerns;
 
+use Drupal\Tests\test_traits\Kernel\TestResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 trait MakesHttpRequests
 {
     /** @var Request */
-    protected $request;
+    private $request;
 
     /** @var \Symfony\Contracts\HttpClient\ResponseInterface */
-    protected $response;
+    private $response;
 
     /** @var null|bool */
-    protected $requestIsAjax = null;
+    private $requestIsAjax = null;
 
-    public function get(string $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null): self
+    public static function responseClass(): string
+    {
+        return TestResponse::class;
+    }
+
+    public function get(string $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null): TestResponse
     {
         return $this->handleRequest(
             Request::create($uri, 'GET', $parameters, $cookies, $files, $server, $content)
         );
     }
 
-    public function post(string $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null): self
+    public function post(string $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null): TestResponse
     {
         return $this->handleRequest(
             Request::create($uri, 'POST', $parameters, $cookies, $files, $server, $content)
         );
     }
 
-    public function put(string $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null): self
+    public function put(string $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null): TestResponse
     {
         return $this->handleRequest(
             Request::create($uri, 'PUT', $parameters, $cookies, $files, $server, $content)
         );
     }
 
-    public function delete(string $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null): self
+    public function delete(string $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null): TestResponse
     {
         return $this->handleRequest(
             Request::create($uri, 'DELETE', $parameters, $cookies, $files, $server, $content)
@@ -51,7 +56,8 @@ trait MakesHttpRequests
         return $this;
     }
 
-    public function handleRequest(Request $request): self
+    /** @return mixed */
+    public function handleRequest(Request $request)
     {
         $this->container->get('kernel')->invalidateContainer();
         $this->container->get('kernel')->rebuildContainer();
@@ -61,66 +67,17 @@ trait MakesHttpRequests
         $this->request->setSession($this->container->get('session'));
 
         if ($this->requestIsAjax !== null) {
-            $request->headers->set('X-Requested-With', 'XMLHttpRequest');
+            $this->request->headers->set('X-Requested-With', 'XMLHttpRequest');
 
             $this->requestIsAjax = null;
         }
 
-        $this->response = $this->container->get('http_kernel')->handle($this->request);
-
-        return $this;
+        return static::responseClass()::fromBaseResponse(
+            $this->container->get('http_kernel')->handle($this->request)
+        );
     }
 
-    public function getRequest(): Request
-    {
-        return $this->request;
-    }
-
-    public function assertOk(): void
-    {
-        static::assertEquals(Response::HTTP_OK, $this->response->getStatusCode());
-    }
-
-    public function assertNotFound(): void
-    {
-        static::assertEquals(Response::HTTP_NOT_FOUND, $this->response->getStatusCode());
-    }
-
-    public function assertNoContent(): void
-    {
-        static::assertEquals(Response::HTTP_NO_CONTENT, $this->response->getStatusCode());
-    }
-
-    public function assertUnprocessable(): void
-    {
-        static::assertEquals(Response::HTTP_UNPROCESSABLE_ENTITY, $this->response->getStatusCode());
-    }
-
-    public function assertRedirectedTo(string $uri): void
-    {
-        static::assertEquals($uri, $this->response->headers->get('location'));
-    }
-
-    public function assertMethodNotAllowed(): void
-    {
-        static::assertEquals(Response::HTTP_METHOD_NOT_ALLOWED, $this->response->getStatusCode());
-    }
-
-    public function assertJsonContent(array $json): void
-    {
-        static::assertEquals($json, json_decode($this->response->getContent()));
-    }
-
-    public function assertJsonContentContains(array $json): void
-    {
-        $decodedResponse = json_decode($this->response->getContent());
-
-        foreach ($json as $key => $value) {
-            static::assertEquals($value, $decodedResponse->{$key});
-        }
-    }
-
-    public function followRedirect(): self
+    public function followRedirect(): TestResponse
     {
         return $this->get(
             $this->response->headers->get('location')
