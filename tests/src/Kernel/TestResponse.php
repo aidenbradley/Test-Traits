@@ -20,34 +20,84 @@ class TestResponse
         $this->response = $response;
     }
 
-    public function assertOk(): void
+    public function assertStatusCode(int $statusCode): void
     {
-        Assert::assertEquals(Response::HTTP_OK, $this->response->getStatusCode());
+        Assert::assertEquals($statusCode, $this->response->getStatusCode());
     }
 
-    public function assertNotFound(): void
+    public function assertContinue(): void
     {
-        Assert::assertEquals(Response::HTTP_NOT_FOUND, $this->response->getStatusCode());
+        $this->assertStatusCode(Response::HTTP_CONTINUE);
+    }
+
+    public function assertSwitchingProtocols(): void
+    {
+        $this->assertStatusCode(Response::HTTP_SWITCHING_PROTOCOLS);
+    }
+
+    public function assertProcessing(): void
+    {
+        $this->assertStatusCode(Response::HTTP_PROCESSING);
+    }
+
+    public function assertEarlyHints(): void
+    {
+        $this->assertStatusCode(Response::HTTP_EARLY_HINTS);
+    }
+
+    public function assertOk(): void
+    {
+        $this->assertStatusCode(Response::HTTP_OK);
+    }
+
+    public function assertCreated(): void
+    {
+        $this->assertStatusCode(Response::HTTP_CREATED);
+    }
+
+    public function assertAccepted(): void
+    {
+        $this->assertStatusCode(Response::HTTP_ACCEPTED);
+    }
+
+    public function assertNonAuthoritativeInformation(): void
+    {
+        $this->assertStatusCode(Response::HTTP_NON_AUTHORITATIVE_INFORMATION);
     }
 
     public function assertNoContent(): void
     {
-        Assert::assertEquals(Response::HTTP_NO_CONTENT, $this->response->getStatusCode());
+        $this->assertStatusCode(Response::HTTP_NO_CONTENT);
+    }
+
+    public function assertResetContent(): void
+    {
+        $this->assertStatusCode(Response::HTTP_RESET_CONTENT);
+    }
+
+    public function assertPartialContent(): void
+    {
+        $this->assertStatusCode(Response::HTTP_PARTIAL_CONTENT);
+    }
+
+    public function assertNotFound(): void
+    {
+        $this->assertStatusCode(Response::HTTP_NOT_FOUND);
     }
 
     public function assertUnprocessable(): void
     {
-        Assert::assertEquals(Response::HTTP_UNPROCESSABLE_ENTITY, $this->response->getStatusCode());
+        $this->assertStatusCode(Response::HTTP_UNPROCESSABLE_ENTITY);
+    }
+
+    public function assertMethodNotAllowed(): void
+    {
+        $this->assertStatusCode(Response::HTTP_METHOD_NOT_ALLOWED);
     }
 
     public function assertRedirectedTo(string $uri): void
     {
         Assert::assertEquals($uri, $this->response->headers->get('location'));
-    }
-
-    public function assertMethodNotAllowed(): void
-    {
-        Assert::assertEquals(Response::HTTP_METHOD_NOT_ALLOWED, $this->response->getStatusCode());
     }
 
     public function assertJsonContent(array $json): void

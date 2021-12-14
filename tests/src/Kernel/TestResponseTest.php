@@ -12,9 +12,69 @@ class TestResponseTest extends KernelTestBase
     ];
 
     /** @test */
+    public function assert_continue(): void
+    {
+        $this->createMockResponse(100)->assertContinue();
+    }
+
+    /** @test */
+    public function assert_switching_protocols(): void
+    {
+        $this->createMockResponse(101)->assertSwitchingProtocols();
+    }
+
+    /** @test */
+    public function assert_processing(): void
+    {
+        $this->createMockResponse(102)->assertProcessing();
+    }
+
+    /** @test */
+    public function assert_early_hints(): void
+    {
+        $this->createMockResponse(103)->assertEarlyHints();
+    }
+
+    /** @test */
     public function assert_ok(): void
     {
         $this->createMockResponse(200)->assertOk();
+    }
+
+    /** @test */
+    public function assert_created(): void
+    {
+        $this->createMockResponse(201)->assertCreated();
+    }
+
+    /** @test */
+    public function assert_accepted(): void
+    {
+        $this->createMockResponse(202)->assertAccepted();
+    }
+
+    /** @test */
+    public function assert_non_authoritative_information(): void
+    {
+        $this->createMockResponse(203)->assertNonAuthoritativeInformation();
+    }
+
+    /** @test */
+    public function assert_no_content(): void
+    {
+        $this->createMockResponse(204)->assertNoContent();
+    }
+
+    /** @test */
+    public function assert_reset_content(): void
+    {
+        $this->createMockResponse(205)->assertResetContent();
+    }
+
+    /** @test */
+    public function assert_partial_content(): void
+    {
+        $this->createMockResponse(206)->assertPartialContent();
     }
 
     /** @test */
