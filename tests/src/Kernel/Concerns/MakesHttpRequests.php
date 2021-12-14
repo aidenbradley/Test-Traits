@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\helpers\Concerns\Tests;
+namespace Drupal\Tests\test_traits\Kernel\Concerns;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -31,10 +31,10 @@ trait MakesHttpRequests
     }
 
     /** @phpstan-ignore-next-line */
-    public function patch(string $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null): self
+    public function put(string $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null): self
     {
         return $this->handleRequest(
-            Request::create($uri, 'PATCH', $parameters, $cookies, $files, $server, $content)
+            Request::create($uri, 'PUT', $parameters, $cookies, $files, $server, $content)
         );
     }
 
@@ -82,6 +82,9 @@ trait MakesHttpRequests
 
     public function handleRequest(Request $request): self
     {
+        $this->container->get('kernel')->invalidateContainer();
+        $this->container->get('kernel')->rebuildContainer();
+
         $this->request = $request;
 
         $this->request->setSession($this->container->get('session'));
@@ -99,7 +102,7 @@ trait MakesHttpRequests
     /** @return mixed */
     public function getJson(string $uri)
     {
-        return (array) json_decode(
+        return (array)json_decode(
             $this->ajaxGet($uri)->response->getContent()
         );
     }
@@ -127,6 +130,11 @@ trait MakesHttpRequests
     public function assertRedirectedTo(string $uri): void
     {
         $this->assertEquals($uri, $this->response->headers->get('location'));
+    }
+
+    public function assertMethodNotAllowed(): void
+    {
+        $this->assertEquals(Response::HTTP_METHOD_NOT_ALLOWED, $this->response->getStatusCode());
     }
 
     public function followRedirect(): self
