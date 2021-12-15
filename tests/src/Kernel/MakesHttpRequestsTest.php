@@ -41,7 +41,7 @@ class MakesHttpRequestsTest extends KernelTestBase
     /** @test */
     public function ajax_xml_http(): void
     {
-        $this->markTestSkipped('Need to figure out how to test this now we have TestResponse');gs
+        $this->markTestSkipped('Need to figure out how to test this now we have TestResponse');
         $this->ajax()->get($this->route('route.get'));
 
         $this->assertTrue($this->request->isXmlHttpRequest());
