@@ -2,16 +2,12 @@
 
 namespace Drupal\Tests\test_traits\Kernel;
 
-use Drupal\KernelTests\KernelTestBase;
+use Drupal\Tests\UnitTestCase;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
-class TestResponseTest extends KernelTestBase
+class TestResponseTest extends UnitTestCase
 {
-    protected static $modules = [
-        'test_traits_test',
-    ];
-
     /** @test */
     public function assert_continue(): void
     {
