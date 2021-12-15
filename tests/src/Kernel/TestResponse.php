@@ -80,14 +80,174 @@ class TestResponse
         $this->assertStatusCode(Response::HTTP_PARTIAL_CONTENT);
     }
 
+    public function assertMultiStatus(): void
+    {
+        $this->assertStatusCode(Response::HTTP_MULTI_STATUS);
+    }
+
+    public function assertAlreadyReported(): void
+    {
+        $this->assertStatusCode(Response::HTTP_ALREADY_REPORTED);
+    }
+
+    public function assertImUsed(): void
+    {
+        $this->assertStatusCode(Response::HTTP_IM_USED);
+    }
+
+    public function assertMultipleChoices(): void
+    {
+        $this->assertStatusCode(Response::HTTP_MULTIPLE_CHOICES);
+    }
+
+    public function assertMovedPermanently(): void
+    {
+        $this->assertStatusCode(Response::HTTP_MOVED_PERMANENTLY);
+    }
+
+    public function assertFound(): void
+    {
+        $this->assertStatusCode(Response::HTTP_FOUND);
+    }
+
+    public function assertSeeOther(): void
+    {
+        $this->assertStatusCode(Response::HTTP_SEE_OTHER);
+    }
+
+    public function assertNotModified(): void
+    {
+        $this->assertStatusCode(Response::HTTP_NOT_MODIFIED);
+    }
+
+    public function assertUseProxy(): void
+    {
+        $this->assertStatusCode(Response::HTTP_USE_PROXY);
+    }
+
+    public function assertReserved(): void
+    {
+        $this->assertStatusCode(Response::HTTP_RESERVED);
+    }
+
+    public function assertTemporaryRedirect(): void
+    {
+        $this->assertStatusCode(Response::HTTP_TEMPORARY_REDIRECT);
+    }
+
+    public function assertPermanentlyRedirect(): void
+    {
+        $this->assertStatusCode(Response::HTTP_PERMANENTLY_REDIRECT);
+    }
+
+    public function assertBadRequest(): void
+    {
+        $this->assertStatusCode(Response::HTTP_BAD_REQUEST);
+    }
+
+    public function assertUnauthorized(): void
+    {
+        $this->assertStatusCode(Response::HTTP_UNAUTHORIZED);
+    }
+
+    public function assertPaymentRequired(): void
+    {
+        $this->assertStatusCode(Response::HTTP_PAYMENT_REQUIRED);
+    }
+
+    public function assertForbidden(): void
+    {
+        $this->assertStatusCode(Response::HTTP_FORBIDDEN);
+    }
+
     public function assertNotFound(): void
     {
         $this->assertStatusCode(Response::HTTP_NOT_FOUND);
     }
 
+    public function assertNotAcceptable(): void
+    {
+        $this->assertStatusCode(Response::HTTP_NOT_ACCEPTABLE);
+    }
+
+    public function assertProxyAuthenticationRequired(): void
+    {
+        $this->assertStatusCode(Response::HTTP_PROXY_AUTHENTICATION_REQUIRED);
+    }
+
+    public function assertRequestTimeout(): void
+    {
+        $this->assertStatusCode(Response::HTTP_REQUEST_TIMEOUT);
+    }
+
+    public function assertConflict(): void
+    {
+        $this->assertStatusCode(Response::HTTP_CONFLICT);
+    }
+
+    public function assertGone(): void
+    {
+        $this->assertStatusCode(Response::HTTP_GONE);
+    }
+
+    public function assertLengthRequired(): void
+    {
+        $this->assertStatusCode(Response::HTTP_LENGTH_REQUIRED);
+    }
+
+    public function assertPreconditionFailed(): void
+    {
+        $this->assertStatusCode(Response::HTTP_PRECONDITION_FAILED);
+    }
+
+    public function assertRequestEntityTooLarge(): void
+    {
+        $this->assertStatusCode(Response::HTTP_REQUEST_ENTITY_TOO_LARGE);
+    }
+
+    public function assertRequestUriTooLong(): void
+    {
+        $this->assertStatusCode(Response::HTTP_REQUEST_URI_TOO_LONG);
+    }
+
+    public function assertUnsupportedMediaType(): void
+    {
+        $this->assertStatusCode(Response::HTTP_UNSUPPORTED_MEDIA_TYPE);
+    }
+
+    public function assertRequestRangeNotSatisfiable(): void
+    {
+        $this->assertStatusCode(Response::HTTP_REQUESTED_RANGE_NOT_SATISFIABLE);
+    }
+
+    public function assertExpectationFailed(): void
+    {
+        $this->assertStatusCode(Response::HTTP_EXPECTATION_FAILED);
+    }
+
+    public function assertImATeapot(): void
+    {
+        $this->assertStatusCode(Response::HTTP_I_AM_A_TEAPOT);
+    }
+
+    public function assertMisdirectedRequest(): void
+    {
+        $this->assertStatusCode(Response::HTTP_MISDIRECTED_REQUEST);
+    }
+
     public function assertUnprocessable(): void
     {
         $this->assertStatusCode(Response::HTTP_UNPROCESSABLE_ENTITY);
+    }
+
+    public function assertLocked(): void
+    {
+        $this->assertStatusCode(Response::HTTP_LOCKED);
+    }
+
+    public function assertFailedDependency(): void
+    {
+        $this->assertStatusCode(Response::HTTP_FAILED_DEPENDENCY);
     }
 
     public function assertMethodNotAllowed(): void
