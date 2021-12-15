@@ -72,8 +72,13 @@ trait MakesHttpRequests
         $httpKernel->terminate($request, $response);
 
         if ($this->followRedirects) {
-            $response = $this->followRedirects($response);
+            return $this->followRedirects($response);
         }
+
+        $kernel = $this->container->get('kernel');
+
+        $kernel->invalidateContainer();
+        $kernel->rebuildContainer();
 
         return static::responseClass()::fromBaseResponse($response);
     }
@@ -96,7 +101,10 @@ trait MakesHttpRequests
                 break;
             }
 
+            dump($response->headers->get('Location'));
             $response = $this->get($response->headers->get('Location'));
+
+            dump(get_class($response), $response->headers->get('Location'));
         }
 
         return $response;
