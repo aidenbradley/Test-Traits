@@ -3,6 +3,7 @@
 namespace Drupal\Tests\test_traits\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 class TestResponseTest extends KernelTestBase
@@ -285,6 +286,40 @@ class TestResponseTest extends KernelTestBase
     public function assert_failed_dependency(): void
     {
         $this->createMockResponse(424)->assertFailedDependency();
+    }
+
+    /** @test */
+    public function assert_json_content(): void
+    {
+        $content = [
+            'key' => 'value',
+            'another_key' => 'another_value',
+            'example' => 'example',
+        ];
+
+        $response = TestResponse::fromBaseResponse(
+            JsonResponse::create($content)
+        );
+
+        $response->assertJsonContent($content);
+    }
+
+    /** @test */
+    public function assert_json_content_contains(): void
+    {
+        $content = [
+            'key' => 'value',
+            'another_key' => 'another_value',
+            'example' => 'example',
+        ];
+
+        $response = TestResponse::fromBaseResponse(
+            JsonResponse::create($content)
+        );
+
+        $response->assertJsonContentContains(['key' => 'value']);
+        $response->assertJsonContentContains(['another_key' => 'another_value']);
+        $response->assertJsonContentContains(['example' => 'example']);
     }
 
     /** @param mixed $content */

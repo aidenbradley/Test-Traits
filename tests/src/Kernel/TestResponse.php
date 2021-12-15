@@ -262,7 +262,7 @@ class TestResponse
 
     public function assertJsonContent(array $json): void
     {
-        Assert::assertEquals($json, json_decode($this->response->getContent()));
+        Assert::assertEquals($json, (array) json_decode($this->response->getContent()));
     }
 
     public function assertJsonContentContains(array $json): void
