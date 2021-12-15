@@ -3,8 +3,10 @@
 namespace Drupal\test_traits_test\Controller;
 
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
+use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -30,15 +32,14 @@ class ResolveRequest implements ContainerInjectionInterface
         return Response::create('content');
     }
 
-    public function requestInfo(): JsonResponse
+    public function redirect(?string $redirectRoute = null): Response
     {
-        return JsonResponse::create([
-            'is_ajax' => $this->request->isXmlHttpRequest(),
-        ]);
-    }
+        if ($redirectRoute !== null) {
+            return RedirectResponse::create(
+                Url::fromRoute($redirectRoute)->toString(true)->getGeneratedUrl()
+            );
+        }
 
-    public function statusCode(string $code): JsonResponse
-    {
-        return JsonResponse::create('Content', (int) $code);
+        return Response::create();
     }
 }

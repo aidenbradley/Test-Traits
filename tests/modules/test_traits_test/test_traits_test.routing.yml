@@ -38,19 +38,19 @@ route.delete:
   requirements:
     _access: 'TRUE'
 
-route.request_info:
-  path: '/request-info'
+route.redirect:
+  path: '/redirect/{redirectRoute}'
   defaults:
-    _controller: '\Drupal\test_traits_test\Controller\ResolveRequest::requestInfo'
+    _controller: '\Drupal\test_traits_test\Controller\ResolveRequest::redirect'
   options:
     no_cache: TRUE
   requirements:
     _access: 'TRUE'
 
-route.status_code:
-  path: '/status/{code}'
+route.redirect_to:
+  path: '/redirect-to'
   defaults:
-    _controller: '\Drupal\test_traits_test\Controller\ResolveRequest::statusCode'
+    _controller: '\Drupal\test_traits_test\Controller\ResolveRequest::redirect'
   options:
     no_cache: TRUE
   requirements:

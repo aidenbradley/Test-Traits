@@ -41,9 +41,17 @@ class MakesHttpRequestsTest extends KernelTestBase
     /** @test */
     public function ajax_xml_http(): void
     {
-        $this->ajax()->get($this->route('route.request_info'));
+        $this->ajax()->get($this->route('route.get'));
 
         $this->assertTrue($this->request->isXmlHttpRequest());
+    }
+
+    /** @test */
+    public function following_redirects(): void
+    {
+        $this->followingRedirects()->get($this->route('route.redirect', [
+            'redirectRoute' => 'route.redirect_to',
+        ]))->assertLocation($this->route('route.redirect_to'));
     }
 
     private function route(string $routeName, array $parameters = [], array $options = []): string

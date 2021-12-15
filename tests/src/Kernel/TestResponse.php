@@ -273,4 +273,27 @@ class TestResponse
             Assert::assertEquals($value, $decodedResponse[$key]);
         }
     }
+
+    public function assertLocation(string $uri): void
+    {
+        Assert::assertEquals($uri, $this->response->headers->get('location'));
+    }
+
+    public function __call($name, $arguments)
+    {
+        if (method_exists($name, $this->response)) {
+            return $this->response->$name(...$arguments);
+        }
+
+        return $this;
+    }
+
+    public function __get($name)
+    {
+        if (property_exists($this->response, $name)) {
+            return $this->response->$name;
+        }
+
+        return $this;
+    }
 }

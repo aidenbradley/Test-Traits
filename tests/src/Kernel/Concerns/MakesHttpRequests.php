@@ -4,6 +4,7 @@ namespace Drupal\Tests\test_traits\Kernel\Concerns;
 
 use Drupal\Tests\test_traits\Kernel\TestResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 trait MakesHttpRequests
 {
@@ -12,6 +13,9 @@ trait MakesHttpRequests
 
     /** @var \Symfony\Contracts\HttpClient\ResponseInterface */
     private $response;
+
+    /** @var bool */
+    private $followRedirects;
 
     /** @var null|bool */
     private $requestIsAjax = null;
@@ -23,30 +27,22 @@ trait MakesHttpRequests
 
     public function get(string $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null): TestResponse
     {
-        return $this->handleRequest(
-            Request::create($uri, 'GET', $parameters, $cookies, $files, $server, $content)
-        );
+        return $this->call('GET', ...func_get_args());
     }
 
     public function post(string $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null): TestResponse
     {
-        return $this->handleRequest(
-            Request::create($uri, 'POST', $parameters, $cookies, $files, $server, $content)
-        );
+        return $this->call('POST', ...func_get_args());
     }
 
     public function put(string $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null): TestResponse
     {
-        return $this->handleRequest(
-            Request::create($uri, 'PUT', $parameters, $cookies, $files, $server, $content)
-        );
+        return $this->call('PUT', ...func_get_args());
     }
 
     public function delete(string $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null): TestResponse
     {
-        return $this->handleRequest(
-            Request::create($uri, 'DELETE', $parameters, $cookies, $files, $server, $content)
-        );
+        return $this->call('DELETE', ...func_get_args());
     }
 
     public function ajax(): self
@@ -57,35 +53,52 @@ trait MakesHttpRequests
     }
 
     /** @return mixed */
-    public function handleRequest(Request $request)
+    public function call(string $method, string $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null): TestResponse
     {
-        $this->container->get('kernel')->invalidateContainer();
-        $this->container->get('kernel')->rebuildContainer();
+        $request = Request::create($uri, $method, $parameters, $cookies, $files, $server, $content);
 
-        $this->request = $request;
+        $request->setSession($this->container->get('session'));
 
-        $this->request->setSession($this->container->get('session'));
-
-        if ($this->requestIsAjax !== null) {
+        if ($this->requestIsAjax) {
             $this->request->headers->set('X-Requested-With', 'XMLHttpRequest');
 
             $this->requestIsAjax = null;
         }
 
-        return static::responseClass()::fromBaseResponse(
-            $this->container->get('http_kernel')->handle($this->request)
-        );
+        $httpKernel = $this->container->get('http_kernel');
+
+        $response = $httpKernel->handle($request);
+
+        $httpKernel->terminate($request, $response);
+
+        if ($this->followRedirects) {
+            $response = $this->followRedirects($response);
+        }
+
+        return static::responseClass()::fromBaseResponse($response);
     }
 
-    public function followRedirect(): TestResponse
+    public function followingRedirects()
     {
-        return $this->get(
-            $this->response->headers->get('location')
-        );
+        $this->followRedirects = true;
+
+        return $this;
     }
 
-    public function getStatusCode(): int
+    protected function followRedirects(Response $response)
     {
-        return $this->response->getStatusCode();
+        $this->followRedirects = false;
+
+        while ($response->isRedirect()) {
+            $location = $response->headers->get('Location');
+
+            if ($location === null) {
+                break;
+            }
+
+            $response = $this->get($response->headers->get('Location'));
+        }
+
+        return $response;
     }
 }
