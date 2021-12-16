@@ -30,13 +30,11 @@ class ResolveRequest implements ContainerInjectionInterface
 
     public function __invoke(): Response
     {
-        dump('hit ' . __METHOD__ . \Drupal::request()->getRequestUri());
         return Response::create('content');
     }
 
     public function xmlHttpOnly(): Response
     {
-        dump('hit ' . __METHOD__ . \Drupal::request()->getRequestUri());
         if ($this->request->isXmlHttpRequest() === false) {
             throw new NotFoundHttpException();
         }
@@ -46,7 +44,6 @@ class ResolveRequest implements ContainerInjectionInterface
 
     public function json(): Response
     {
-        dump('hit ' . __METHOD__ . \Drupal::request()->getRequestUri());
         if ($this->request->getContentType() !== 'json') {
             throw new NotFoundHttpException();
         }
@@ -56,7 +53,6 @@ class ResolveRequest implements ContainerInjectionInterface
 
     public function redirect(?string $redirectRoute = null): Response
     {
-        dump('hit ' . __METHOD__ . \Drupal::request()->getRequestUri());
         if ($redirectRoute !== null) {
             return RedirectResponse::create(
                 Url::fromRoute($redirectRoute)->toString(true)->getGeneratedUrl()
