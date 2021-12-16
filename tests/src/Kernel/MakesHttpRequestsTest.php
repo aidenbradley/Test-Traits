@@ -53,11 +53,10 @@ class MakesHttpRequestsTest extends KernelTestBase
     /** @test */
     public function ajax_xml_http(): void
     {
-        $response = $this->ajax()->get($this->route('route.get'));
+        // controller throws NotFoundHttpException if the request isn't XML HTTP
+        $this->get($this->route('route.xml_http_only'))->assertNotFound();
 
-        dump($response->headers->all());
-
-        $this->assertTrue($this->request->isXmlHttpRequest());
+        $this->ajax()->get($this->route('route.xml_http_only'))->assertOk();
     }
 
     /** @test */

@@ -58,6 +58,16 @@ route.delete:
   requirements:
     _access: 'TRUE'
 
+route.xml_http_only:
+  path: '/xml-http-only'
+  defaults:
+    _controller: '\Drupal\test_traits_test\Controller\ResolveRequest::xmlHttpOnly'
+  methods: [GET]
+  options:
+    no_cache: TRUE
+  requirements:
+    _access: 'TRUE'
+
 route.redirect:
   path: '/redirect/{redirectRoute}'
   defaults:

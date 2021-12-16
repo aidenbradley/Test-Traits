@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ResolveRequest implements ContainerInjectionInterface
 {
@@ -32,6 +33,15 @@ class ResolveRequest implements ContainerInjectionInterface
         $response = Response::create('content');
 
         return $response;
+    }
+
+    public function xmlHttpOnly(): Response
+    {
+        if ($this->request->isXmlHttpRequest() === false) {
+            throw new NotFoundHttpException();
+        }
+
+        return Response::create();
     }
 
     public function redirect(?string $redirectRoute = null): Response
