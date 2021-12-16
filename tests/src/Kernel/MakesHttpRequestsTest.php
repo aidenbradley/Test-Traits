@@ -74,7 +74,9 @@ class MakesHttpRequestsTest extends KernelTestBase
             'redirectRoute' => 'route.redirect_to',
         ]));
 
-        $response->assertRedirect($this->route('route.redirect_to'));
+        $response->assertLocation($this->route('route.redirect', [
+            'redirectRoute' => 'route.redirect_to',
+        ]))->assertRedirect($this->route('route.redirect_to'));
     }
 
     /** @test */
