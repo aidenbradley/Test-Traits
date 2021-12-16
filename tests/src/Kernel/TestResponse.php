@@ -5,24 +5,20 @@ namespace Drupal\Tests\test_traits\Kernel;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Response;
 
-class TestResponse
+class TestResponse extends Response
 {
-    /** @var Response */
-    private $response;
-
     public static function fromBaseResponse(Response $response)
     {
-        return new self($response);
-    }
-
-    public function __construct(Response $response)
-    {
-        $this->response = $response;
+        return new static(
+            $response->getContent(),
+            $response->getStatusCode(),
+            $response->headers->all()
+        );
     }
 
     public function assertStatusCode(int $statusCode): void
     {
-        Assert::assertEquals($statusCode, $this->response->getStatusCode());
+        Assert::assertEquals($statusCode, $this->getStatusCode());
     }
 
     public function assertContinue(): void
@@ -255,19 +251,14 @@ class TestResponse
         $this->assertStatusCode(Response::HTTP_METHOD_NOT_ALLOWED);
     }
 
-    public function assertRedirectedTo(string $uri): void
-    {
-        Assert::assertEquals($uri, $this->response->headers->get('location'));
-    }
-
     public function assertJsonContent(array $json): void
     {
-        Assert::assertEquals($json, (array) json_decode($this->response->getContent()));
+        Assert::assertEquals($json, (array) json_decode($this->getContent()));
     }
 
     public function assertJsonContentContains(array $json): void
     {
-        $decodedResponse = (array) json_decode($this->response->getContent());
+        $decodedResponse = (array) json_decode($this->getContent());
 
         foreach ($json as $key => $value) {
             Assert::assertEquals($value, $decodedResponse[$key]);
@@ -276,25 +267,15 @@ class TestResponse
 
     public function assertLocation(string $uri): void
     {
-        dump($this->response->headers->all());
-        Assert::assertEquals($uri, $this->response->headers->get('Location'));
+        Assert::assertEquals($uri, \Drupal::service('path.current')->getPath());
     }
 
-    public function __call($name, $arguments)
+    public function assertRedirect(?string $uri = null): void
     {
-        if (method_exists($name, $this->response)) {
-            return $this->response->$name(...$arguments);
+        Assert::assertTrue($this->isRedirect());
+
+        if ($uri !== null) {
+            Assert::assertEquals($uri, $this->headers->get('Location'));
         }
-
-        return $this;
-    }
-
-    public function __get($name)
-    {
-        if (property_exists($this->response, $name)) {
-            return $this->response->$name;
-        }
-
-        return $this;
     }
 }

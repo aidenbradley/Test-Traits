@@ -72,7 +72,7 @@ trait MakesHttpRequests
         $httpKernel->terminate($request, $response);
 
         if ($this->followRedirects) {
-            return $this->followRedirects($response);
+            $response = $this->followRedirects($response);
         }
 
         $kernel = $this->container->get('kernel');

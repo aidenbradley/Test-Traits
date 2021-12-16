@@ -29,7 +29,9 @@ class ResolveRequest implements ContainerInjectionInterface
 
     public function __invoke(): Response
     {
-        return Response::create('content');
+        $response = Response::create('content');
+
+        return $response;
     }
 
     public function redirect(?string $redirectRoute = null): Response
