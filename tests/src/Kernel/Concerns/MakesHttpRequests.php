@@ -101,10 +101,7 @@ trait MakesHttpRequests
                 break;
             }
 
-            dump($response->headers->get('Location'));
             $response = $this->get($response->headers->get('Location'));
-
-            dump(get_class($response), $response->headers->get('Location'));
         }
 
         return $response;

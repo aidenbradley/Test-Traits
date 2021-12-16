@@ -276,7 +276,7 @@ class TestResponse
 
     public function assertLocation(string $uri): void
     {
-        dump($this->response->headers);
+        dump($this->response->headers->all());
         Assert::assertEquals($uri, $this->response->headers->get('Location'));
     }
 

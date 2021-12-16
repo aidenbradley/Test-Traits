@@ -15,25 +15,25 @@ class MakesHttpRequestsTest extends KernelTestBase
     ];
 
     /** @test */
-    public function get_http_verb(): void
+    public function http_get(): void
     {
         $this->get($this->route('route.get'))->assertOk();
     }
 
     /** @test */
-    public function post_http_verb(): void
+    public function http_post(): void
     {
         $this->post($this->route('route.post'))->assertOk();
     }
 
     /** @test */
-    public function put_http_verb(): void
+    public function http_put(): void
     {
         $this->put($this->route('route.put'))->assertOk();
     }
 
     /** @test */
-    public function delete_http_verb(): void
+    public function http_delete(): void
     {
         $this->delete($this->route('route.delete'))->assertOk();
     }
@@ -48,7 +48,7 @@ class MakesHttpRequestsTest extends KernelTestBase
     }
 
     /** @test */
-    public function assert_location()
+    public function assert_location(): void
     {
         $route = $this->route('route.get');
 
