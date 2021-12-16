@@ -33,16 +33,29 @@ class MakesHttpRequestsTest extends KernelTestBase
     }
 
     /** @test */
+    public function http_patch(): void
+    {
+        $this->patch($this->route('route.patch'))->assertOk();
+    }
+
+    /** @test */
     public function http_delete(): void
     {
         $this->delete($this->route('route.delete'))->assertOk();
     }
 
     /** @test */
+    public function http_options(): void
+    {
+        $this->options($this->route('route.options'))->assertOk();
+    }
+
+    /** @test */
     public function ajax_xml_http(): void
     {
-        $this->markTestSkipped('Need to figure out how to test this now we have TestResponse');
-        $this->ajax()->get($this->route('route.get'));
+        $response = $this->ajax()->get($this->route('route.get'));
+
+        dump($response->headers->all());
 
         $this->assertTrue($this->request->isXmlHttpRequest());
     }

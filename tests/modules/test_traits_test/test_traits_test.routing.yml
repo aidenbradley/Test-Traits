@@ -28,6 +28,26 @@ route.put:
   requirements:
     _access: 'TRUE'
 
+route.patch:
+  path: '/patch'
+  defaults:
+    _controller: '\Drupal\test_traits_test\Controller\ResolveRequest'
+  methods: [PATCH]
+  options:
+    no_cache: TRUE
+  requirements:
+    _access: 'TRUE'
+
+route.options:
+  path: '/options'
+  defaults:
+    _controller: '\Drupal\test_traits_test\Controller\ResolveRequest'
+  methods: [OPTIONS]
+  options:
+    no_cache: TRUE
+  requirements:
+    _access: 'TRUE'
+
 route.delete:
   path: '/delete'
   defaults:

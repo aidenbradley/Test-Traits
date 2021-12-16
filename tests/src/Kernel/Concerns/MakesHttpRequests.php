@@ -40,6 +40,16 @@ trait MakesHttpRequests
         return $this->call('PUT', ...func_get_args());
     }
 
+    public function patch(string $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null): TestResponse
+    {
+        return $this->call('PATCH', ...func_get_args());
+    }
+
+    public function options(string $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null): TestResponse
+    {
+        return $this->call('OPTIONS', ...func_get_args());
+    }
+
     public function delete(string $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null): TestResponse
     {
         return $this->call('DELETE', ...func_get_args());
@@ -60,7 +70,7 @@ trait MakesHttpRequests
         $request->setSession($this->container->get('session'));
 
         if ($this->requestIsAjax) {
-            $this->request->headers->set('X-Requested-With', 'XMLHttpRequest');
+            $request->headers->set('X-Requested-With', 'XMLHttpRequest');
 
             $this->requestIsAjax = null;
         }
