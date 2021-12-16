@@ -91,14 +91,6 @@ class MakesHttpRequestsTest extends KernelTestBase
     }
 
     /** @test */
-    public function http_options_json(): void
-    {
-        $this->options($this->route('route.json.options'))->assertNotFound();
-
-        $this->optionsJson($this->route('route.json.options'))->assertOK();
-    }
-
-    /** @test */
     public function ajax_xml_http(): void
     {
         // controller throws NotFoundHttpException if the request isn't XML HTTP
