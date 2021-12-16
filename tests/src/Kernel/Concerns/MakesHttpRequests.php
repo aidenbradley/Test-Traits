@@ -105,12 +105,6 @@ trait MakesHttpRequests
         $this->followRedirects = false;
 
         while ($response->isRedirect()) {
-            $location = $response->headers->get('Location');
-
-            if ($location === null) {
-                break;
-            }
-
             $response = $this->get($response->headers->get('Location'));
         }
 
