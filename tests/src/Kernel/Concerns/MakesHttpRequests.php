@@ -30,9 +30,19 @@ trait MakesHttpRequests
         return $this->call('GET', ...func_get_args());
     }
 
+    public function getJson(string $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null): TestResponse
+    {
+        return $this->json('GET', ...func_get_args());
+    }
+
     public function post(string $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null): TestResponse
     {
         return $this->call('POST', ...func_get_args());
+    }
+
+    public function postJson(string $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null): TestResponse
+    {
+        return $this->json('POST', ...func_get_args());
     }
 
     public function put(string $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null): TestResponse
@@ -40,9 +50,19 @@ trait MakesHttpRequests
         return $this->call('PUT', ...func_get_args());
     }
 
+    public function putJson(string $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null): TestResponse
+    {
+        return $this->json('PUT', ...func_get_args());
+    }
+
     public function patch(string $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null): TestResponse
     {
         return $this->call('PATCH', ...func_get_args());
+    }
+
+    public function patchJson(string $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null): TestResponse
+    {
+        return $this->json('PATCH', ...func_get_args());
     }
 
     public function options(string $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null): TestResponse
@@ -50,9 +70,19 @@ trait MakesHttpRequests
         return $this->call('OPTIONS', ...func_get_args());
     }
 
+    public function optionsJson(string $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null): TestResponse
+    {
+        return $this->json('OPTIONS', ...func_get_args());
+    }
+
     public function delete(string $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null): TestResponse
     {
         return $this->call('DELETE', ...func_get_args());
+    }
+
+    public function deleteJson(string $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null): TestResponse
+    {
+        return $this->json('DELETE', ...func_get_args());
     }
 
     public function ajax(): self
@@ -60,6 +90,25 @@ trait MakesHttpRequests
         $this->requestIsAjax = true;
 
         return $this;
+    }
+
+    public function json(string $method, string $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null): TestResponse
+    {
+        $headers = array_merge([
+            'CONTENT_LENGTH' => mb_strlen($content, '8bit'),
+            'CONTENT_TYPE' => 'application/json',
+            'Accept' => 'application/json',
+        ], $server);
+
+        return $this->call(
+            $method,
+            $uri,
+            $parameters,
+            $cookies,
+            $files,
+            $headers,
+            $content
+        );
     }
 
     /** @return mixed */

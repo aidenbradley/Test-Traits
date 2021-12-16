@@ -5,6 +5,7 @@ namespace Drupal\test_traits_test\Controller;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -29,13 +30,13 @@ class ResolveRequest implements ContainerInjectionInterface
 
     public function __invoke(): Response
     {
-        $response = Response::create('content');
-
-        return $response;
+        dump('hit ' . __METHOD__ . \Drupal::request()->getRequestUri());
+        return Response::create('content');
     }
 
     public function xmlHttpOnly(): Response
     {
+        dump('hit ' . __METHOD__ . \Drupal::request()->getRequestUri());
         if ($this->request->isXmlHttpRequest() === false) {
             throw new NotFoundHttpException();
         }
@@ -43,8 +44,19 @@ class ResolveRequest implements ContainerInjectionInterface
         return Response::create();
     }
 
+    public function json(): Response
+    {
+        dump('hit ' . __METHOD__ . \Drupal::request()->getRequestUri());
+        if ($this->request->getContentType() !== 'json') {
+            throw new NotFoundHttpException();
+        }
+
+        return JsonResponse::create();
+    }
+
     public function redirect(?string $redirectRoute = null): Response
     {
+        dump('hit ' . __METHOD__ . \Drupal::request()->getRequestUri());
         if ($redirectRoute !== null) {
             return RedirectResponse::create(
                 Url::fromRoute($redirectRoute)->toString(true)->getGeneratedUrl()

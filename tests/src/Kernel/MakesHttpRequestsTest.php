@@ -21,9 +21,25 @@ class MakesHttpRequestsTest extends KernelTestBase
     }
 
     /** @test */
+    public function http_get_json(): void
+    {
+        $this->get($this->route('route.json.get'))->assertNotFound();
+
+        $this->getJson($this->route('route.json.get'))->assertOK();
+    }
+
+    /** @test */
     public function http_post(): void
     {
         $this->post($this->route('route.post'))->assertOk();
+    }
+
+    /** @test */
+    public function http_post_json(): void
+    {
+        $this->post($this->route('route.json.post'))->assertNotFound();
+
+        $this->postJson($this->route('route.json.post'))->assertOK();
     }
 
     /** @test */
@@ -33,9 +49,25 @@ class MakesHttpRequestsTest extends KernelTestBase
     }
 
     /** @test */
+    public function http_put_json(): void
+    {
+        $this->put($this->route('route.json.put'))->assertNotFound();
+
+        $this->putJson($this->route('route.json.put'))->assertOK();
+    }
+
+    /** @test */
     public function http_patch(): void
     {
         $this->patch($this->route('route.patch'))->assertOk();
+    }
+
+    /** @test */
+    public function http_patch_json(): void
+    {
+        $this->patch($this->route('route.json.patch'))->assertNotFound();
+
+        $this->patchJson($this->route('route.json.patch'))->assertOK();
     }
 
     /** @test */
@@ -45,9 +77,25 @@ class MakesHttpRequestsTest extends KernelTestBase
     }
 
     /** @test */
+    public function http_delete_json(): void
+    {
+        $this->delete($this->route('route.json.delete'))->assertNotFound();
+
+        $this->deleteJson($this->route('route.json.delete'))->assertOK();
+    }
+
+    /** @test */
     public function http_options(): void
     {
         $this->options($this->route('route.options'))->assertOk();
+    }
+
+    /** @test */
+    public function http_options_json(): void
+    {
+        $this->options($this->route('route.json.options'))->assertNotFound();
+
+        $this->optionsJson($this->route('route.json.options'))->assertOK();
     }
 
     /** @test */
