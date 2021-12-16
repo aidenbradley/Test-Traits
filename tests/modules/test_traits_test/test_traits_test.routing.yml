@@ -88,16 +88,6 @@ route.options:
   requirements:
     _access: 'TRUE'
 
-route.json.options:
-  path: '/options-json'
-  defaults:
-    _controller: '\Drupal\test_traits_test\Controller\ResolveRequest::json'
-  methods: [OPTIONS]
-  options:
-    no_cache: TRUE
-  requirements:
-    _access: 'TRUE'
-
 route.delete:
   path: '/delete'
   defaults:
