@@ -222,6 +222,39 @@ class InstallsExportedConfigTest extends KernelTestBase
         $this->assertTrue($node->hasField('field_boolean_field'));
     }
 
+    /** @test */
+    public function install_entity_schema_with_bundles(): void
+    {
+        $this->setConfigDirectory('node/bundles');
+
+        $entityTypeManager = $this->container->get('entity_type.manager');
+
+        $nodeEntityTypeDefinition = $entityTypeManager->getDefinition('node');
+
+        $this->assertFalse($this->container->get('database')->schema()->tableExists(
+            $nodeEntityTypeDefinition->getDataTable()
+        ));
+
+        $this->assertEmpty($entityTypeManager->getStorage('node_type')->loadMultiple());
+
+        $bundlesToInstall = [
+            'page',
+            'news',
+        ];
+
+        $this->installEntitySchemaWithBundles('node', $bundlesToInstall);
+
+        $this->assertTrue($this->container->get('database')->schema()->tableExists(
+            $nodeEntityTypeDefinition->getDataTable()
+        ));
+
+        $nodeTypeIds = array_map(function(NodeType $nodeType) {
+            return $nodeType->id();
+        }, $entityTypeManager->getStorage('node_type')->loadMultiple());
+
+        $this->assertEquals($bundlesToInstall, array_values($nodeTypeIds));
+    }
+
     /** sets the config directory relative to the fixtures route */
     public function setConfigDirectory(string $directory): void
     {
