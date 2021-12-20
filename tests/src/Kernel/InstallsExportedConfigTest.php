@@ -5,6 +5,7 @@ namespace Drupal\Tests\test_traits\Kernel;
 use Drupal\image\Entity\ImageStyle;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\node\Entity\NodeType;
+use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\Tests\test_traits\Kernel\Concerns\InstallsExportedConfig;
 use Drupal\Tests\test_traits\Kernel\Exceptions\ConfigInstallFailed;
 use Drupal\user\Entity\Role;
@@ -177,6 +178,37 @@ class InstallsExportedConfigTest extends KernelTestBase
         $tagsVocabulary = reset($vocabularies);
 
         $this->assertEquals('tags', $tagsVocabulary->id());
+    }
+
+    /** @test */
+    public function install_vocabularies(): void
+    {
+        $this->enableModules([
+            'taxonomy',
+        ]);
+        $this->installEntitySchema('taxonomy_vocabulary');
+
+        $this->setConfigDirectory('taxonomy');
+
+        $vocabularyStorage = $this->container->get('entity_type.manager')->getStorage('taxonomy_vocabulary');
+
+        $this->assertEmpty($vocabularyStorage->loadMultiple());
+
+        $vocabulariesToInstall = [
+            'category',
+            'tags',
+        ];
+        $this->installVocabularies($vocabulariesToInstall);
+
+        $vocabularies = $vocabularyStorage->loadMultiple();
+
+        $this->assertNotEmpty($vocabularies);
+
+        $vocabularyIds = array_map(function(Vocabulary $vocabulary) {
+            return $vocabulary->id();
+        }, $vocabularyStorage->loadMultiple());
+
+        $this->assertEquals($vocabulariesToInstall, array_values($vocabularyIds));
     }
 
     /** @test */

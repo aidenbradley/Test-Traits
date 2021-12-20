@@ -103,6 +103,13 @@ trait InstallsExportedConfig
         ]);
     }
 
+    public function installVocabularies(array $vocabularies): void
+    {
+        foreach ($vocabularies as $vocabulary) {
+            $this->installVocabulary($vocabulary);
+        }
+    }
+
     /** @param string|array $config */
     public function installExportedConfig($config): void
     {
