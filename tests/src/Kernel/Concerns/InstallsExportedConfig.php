@@ -107,7 +107,7 @@ trait InstallsExportedConfig
 
         $this->installFields(array_map(function ($storageFieldName) {
             return substr($storageFieldName, strripos($storageFieldName, '.') + 1);
-        }, $configStorage->listAll("field.storage.$entityType")), $entityType, $bundle);
+        }, $configStorage->listAll('field.storage.' . $entityType)), $entityType, $bundle);
     }
 
     /** @param string|array $config */
