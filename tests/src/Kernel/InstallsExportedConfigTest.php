@@ -151,6 +151,77 @@ class InstallsExportedConfigTest extends KernelTestBase
         $this->assertEquals('tags', $tagsVocabulary->id());
     }
 
+    /** @test */
+    public function install_field(): void
+    {
+        $this->installEntitySchema('user');
+        $this->installEntitySchema('node');
+
+        $this->enableModules([
+            'text',
+        ]);
+
+        $this->setConfigDirectory('node/bundles');
+        $this->installBundle('node', 'page');
+
+        $this->setConfigDirectory('node/fields');
+
+        $nodeStorage = $this->container->get('entity_type.manager')->getStorage('node');
+
+        $node = $nodeStorage->create([
+            'nid' => 1,
+            'type' => 'page',
+            'title' => 'Node',
+        ]);
+        $node->save();
+
+        $this->assertFalse($node->hasField('body'));
+
+        $this->installField('body', 'node', 'page');
+
+        $node = $nodeStorage->load(1);
+
+        $this->assertTrue($node->hasField('body'));
+    }
+
+    /** @test */
+    public function install_fields(): void
+    {
+        $this->installEntitySchema('user');
+        $this->installEntitySchema('node');
+
+        $this->enableModules([
+            'text',
+        ]);
+
+        $this->setConfigDirectory('node/bundles');
+        $this->installBundle('node', 'page');
+
+        $this->setConfigDirectory('node/fields');
+
+        $nodeStorage = $this->container->get('entity_type.manager')->getStorage('node');
+
+        $node = $nodeStorage->create([
+            'nid' => 1,
+            'type' => 'page',
+            'title' => 'Node',
+        ]);
+        $node->save();
+
+        $this->assertFalse($node->hasField('body'));
+        $this->assertFalse($node->hasField('field_boolean'));
+
+        $this->installFields([
+            'body',
+            'field_boolean_field',
+        ], 'node', 'page');
+
+        $node = $nodeStorage->load(1);
+
+        $this->assertTrue($node->hasField('body'));
+        $this->assertTrue($node->hasField('field_boolean_field'));
+    }
+
     /** sets the config directory relative to the fixtures route */
     public function setConfigDirectory(string $directory): void
     {

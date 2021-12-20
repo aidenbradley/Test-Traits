@@ -18,14 +18,14 @@ trait InstallsExportedConfig
     /** @var bool */
     protected $installFieldModule;
 
-    public function installExportedFields(array $fieldNames, string $entityType, ?string $bundle = null): void
+    public function installFields(array $fieldNames, string $entityType, ?string $bundle = null): void
     {
         foreach ($fieldNames as $fieldName) {
-            $this->installExportedField($fieldName, $entityType, $bundle);
+            $this->installField($fieldName, $entityType, $bundle);
         }
     }
 
-    public function installExportedField(string $fieldName, string $entityType, ?string $bundle = null): void
+    public function installField(string $fieldName, string $entityType, ?string $bundle = null): void
     {
         if (isset($this->installFieldModule) === false) {
             $this->enableModules(['field']);
@@ -43,7 +43,7 @@ trait InstallsExportedConfig
     {
         $configStorage = new FileStorage($this->configDirectory());
 
-        $this->installExportedFields(array_map(function ($storageFieldName) {
+        $this->installFields(array_map(function ($storageFieldName) {
             return substr($storageFieldName, strripos($storageFieldName, '.') + 1);
         }, $configStorage->listAll("field.storage.$entityType")), $entityType, $bundle);
     }
@@ -103,7 +103,7 @@ trait InstallsExportedConfig
             $storage = \Drupal::entityTypeManager()->getStorage($entityType);
 
             if (is_array($configRecord) === false) {
-                throw ConfigInstallFailed::doesNotExist($configRecord);
+                throw ConfigInstallFailed::doesNotExist($configName);
             }
 
             $storage->createFromStorageRecord($configRecord)->save();
