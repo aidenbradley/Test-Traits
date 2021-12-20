@@ -84,6 +84,18 @@ trait InstallsExportedConfig
         $this->installBundles($entityType, (array)$bundles);
     }
 
+    public function installRole(string $role): void
+    {
+        $this->installExportedConfig('user.role.' . $role);
+    }
+
+    public function installRoles(array $roles): void
+    {
+        foreach ($roles as $role) {
+            $this->installRole($role);
+        }
+    }
+
     public function installVocabulary(string $vocabularyName): void
     {
         $this->installExportedConfig([
@@ -116,11 +128,6 @@ trait InstallsExportedConfig
 
             $storage->createFromStorageRecord($configRecord)->save();
         }
-    }
-
-    public function installRole(string $role): void
-    {
-        $this->installExportedConfig('user.role.' . $role);
     }
 
     public function configDirectory(): string

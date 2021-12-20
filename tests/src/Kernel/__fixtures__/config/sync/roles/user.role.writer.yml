@@ -1,0 +1,12 @@
+uuid: 8d5399a0-589e-44ad-82a5-208fda9c0b89
+langcode: en
+status: true
+dependencies: {  }
+_core:
+  default_config_hash: j5zLMOdJBqC0bMvSdth5UebkprJB8g_2FXHqhfpJzow
+id: writer
+label: 'Writer'
+weight: 0
+is_admin: false
+permissions:
+  - 'access content'

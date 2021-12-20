@@ -7,6 +7,7 @@ use Drupal\KernelTests\KernelTestBase;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\test_traits\Kernel\Concerns\InstallsExportedConfig;
 use Drupal\Tests\test_traits\Kernel\Exceptions\ConfigInstallFailed;
+use Drupal\user\Entity\Role;
 
 class InstallsExportedConfigTest extends KernelTestBase
 {
@@ -125,6 +126,32 @@ class InstallsExportedConfigTest extends KernelTestBase
         $editorRole = reset($roles);
 
         $this->assertEquals('editor', $editorRole->id());
+    }
+
+    /** @test */
+    public function install_roles(): void
+    {
+        $this->setConfigDirectory('roles');
+
+        $userRoleStorage = $this->container->get('entity_type.manager')->getStorage('user_role');
+
+        $this->assertEmpty($userRoleStorage->loadMultiple());
+
+        $rolesToInstall = [
+            'writer',
+            'editor',
+        ];
+        $this->installRoles($rolesToInstall);
+
+        $roles = $userRoleStorage->loadMultiple();
+
+        $this->assertNotEmpty($roles);
+
+        $roleIds = array_map(function(Role $role) {
+            return $role->id();
+        }, $userRoleStorage->loadMultiple());
+
+        $this->assertEquals($rolesToInstall, array_values($roleIds));
     }
 
     /** @test */
