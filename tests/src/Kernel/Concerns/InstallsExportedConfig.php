@@ -3,6 +3,8 @@
 namespace Drupal\Tests\test_traits\Kernel\Concerns;
 
 use Drupal\Core\Config\FileStorage;
+use Drupal\Core\Site\Settings;
+use Drupal\Tests\test_traits\Kernel\Exceptions\ConfigInstallFailed;
 
 /**
  * This trait may be used to test fields stored as field configs
@@ -27,6 +29,7 @@ trait InstallsExportedConfig
     {
         if (isset($this->installFieldModule) === false) {
             $this->enableModules(['field']);
+
             $this->installFieldModule = true;
         }
 
@@ -38,9 +41,7 @@ trait InstallsExportedConfig
 
     public function installAllFieldsForEntity(string $entityType, ?string $bundle = null): void
     {
-        $configStorage = new FileStorage(
-            str_replace('web/', '', \Drupal::service('app.root') . '/config/sync')
-        );
+        $configStorage = new FileStorage($this->configDirectory());
 
         $this->installExportedFields(array_map(function ($storageFieldName) {
             return substr($storageFieldName, strripos($storageFieldName, '.') + 1);
@@ -85,9 +86,7 @@ trait InstallsExportedConfig
 
     public function installExportedConfig($config): void
     {
-        $configStorage = new FileStorage(
-            str_replace('web/', '', \Drupal::service('app.root') . '/config/sync')
-        );
+        $configStorage = new FileStorage($this->configDirectory());
 
         foreach ((array) $config as $configName) {
             if (in_array($configName, $this->installedConfig)) {
@@ -104,7 +103,7 @@ trait InstallsExportedConfig
             $storage = \Drupal::entityTypeManager()->getStorage($entityType);
 
             if (is_array($configRecord) === false) {
-                return;
+                throw ConfigInstallFailed::doesNotExist($configRecord);
             }
 
             $storage->createFromStorageRecord($configRecord)->save();
@@ -114,5 +113,10 @@ trait InstallsExportedConfig
     public function installRole(string $role): void
     {
         $this->installExportedConfig('user.role.' . $role);
+    }
+
+    public function configDirectory(): string
+    {
+        return Settings::get('config_sync_directory');
     }
 }
