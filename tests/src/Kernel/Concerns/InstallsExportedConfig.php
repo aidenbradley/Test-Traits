@@ -48,11 +48,18 @@ trait InstallsExportedConfig
         }, $configStorage->listAll("field.storage.$entityType")), $entityType, $bundle);
     }
 
-    public function installExportedImageStyle(string $imageStyle): void
+    public function installImageStyle(string $imageStyle): void
     {
         $this->installExportedConfig([
             'image.style.' . $imageStyle,
         ]);
+    }
+
+    public function installImageStyles(array $imageStyles): void
+    {
+        foreach ($imageStyles as $imageStyle) {
+            $this->installImageStyle($imageStyle);
+        }
     }
 
     public function installBundle(string $module, string $bundle): void
@@ -74,7 +81,7 @@ trait InstallsExportedConfig
     {
         $this->installEntitySchema($entityType);
 
-        $this->installBundles($entityType, (array) $bundles);
+        $this->installBundles($entityType, (array)$bundles);
     }
 
     public function installVocabulary(string $vocabularyName): void
@@ -84,11 +91,12 @@ trait InstallsExportedConfig
         ]);
     }
 
+    /** @param string|array $config */
     public function installExportedConfig($config): void
     {
         $configStorage = new FileStorage($this->configDirectory());
 
-        foreach ((array) $config as $configName) {
+        foreach ((array)$config as $configName) {
             if (in_array($configName, $this->installedConfig)) {
                 continue;
             }
