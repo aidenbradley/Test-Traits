@@ -100,6 +100,26 @@ class InstallsExportedConfigTest extends KernelTestBase
         $this->assertEquals('page', $pageNodeType->id());
     }
 
+    /** @test */
+    public function install_role(): void
+    {
+        $this->setConfigDirectory('roles');
+
+        $userRoleStorage = $this->container->get('entity_type.manager')->getStorage('user_role');
+
+        $this->assertEmpty($userRoleStorage->loadMultiple());
+
+        $this->installRole('editor');
+
+        $roles = $userRoleStorage->loadMultiple();
+
+        $this->assertNotEmpty($roles);
+
+        $editorRole = reset($roles);
+
+        $this->assertEquals('editor', $editorRole->id());
+    }
+
     /** sets the config directory relative to the fixtures route */
     public function setConfigDirectory(string $directory): void
     {
