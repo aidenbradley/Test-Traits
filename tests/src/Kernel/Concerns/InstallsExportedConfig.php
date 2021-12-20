@@ -55,17 +55,17 @@ trait InstallsExportedConfig
         ]);
     }
 
-    public function installExportedBundle(string $module, string $bundle): void
+    public function installBundle(string $module, string $bundle): void
     {
         $this->installExportedConfig([
             $module . '.type.' . $bundle,
         ]);
     }
 
-    public function installExportedBundles(string $entityType, array $bundles): void
+    public function installBundles(string $entityType, array $bundles): void
     {
         foreach ($bundles as $bundle) {
-            $this->installExportedBundle($entityType, $bundle);
+            $this->installBundle($entityType, $bundle);
         }
     }
 
@@ -74,7 +74,7 @@ trait InstallsExportedConfig
     {
         $this->installEntitySchema($entityType);
 
-        $this->installExportedBundles($entityType, (array) $bundles);
+        $this->installBundles($entityType, (array) $bundles);
     }
 
     public function installExportedVocabulary(string $vocabularyName): void
