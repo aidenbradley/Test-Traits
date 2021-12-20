@@ -368,6 +368,41 @@ class InstallsExportedConfigTest extends KernelTestBase
         $this->assertEquals($imageStylesToInstall, array_values($imageStyleIds));
     }
 
+    /** @test */
+    public function install_all_fields_for_entity(): void
+    {
+        $this->installEntitySchema('user');
+        $this->installEntitySchema('node');
+
+        $this->enableModules([
+            'text',
+        ]);
+
+        $this->setConfigDirectory('node/bundles');
+        $this->installBundle('node', 'page');
+
+        $this->setConfigDirectory('node/fields');
+
+        $nodeStorage = $this->container->get('entity_type.manager')->getStorage('node');
+
+        $node = $nodeStorage->create([
+            'nid' => 1,
+            'type' => 'page',
+            'title' => 'Node',
+        ]);
+        $node->save();
+
+        $this->assertFalse($node->hasField('body'));
+        $this->assertFalse($node->hasField('field_boolean'));
+
+        $this->installAllFieldsForEntity('node', 'page');
+
+        $node = $nodeStorage->load(1);
+
+        $this->assertTrue($node->hasField('body'));
+        $this->assertTrue($node->hasField('field_boolean_field'));
+    }
+
     /** sets the config directory relative to the fixtures route */
     public function setConfigDirectory(string $directory): void
     {
@@ -380,7 +415,7 @@ class InstallsExportedConfigTest extends KernelTestBase
             return $this->InstallsExportedConfigDirectory();
         }
 
-        $baseConfigPath = __DIR__ . '/__fixtures__/config/sync/';
+        $baseConfigPath = __DIR__ . '/__fixtures__/config/sync';
 
         if ($this->customConfigDirectory) {
             return $baseConfigPath . '/' . ltrim($this->customConfigDirectory, '/');

@@ -18,13 +18,6 @@ trait InstallsExportedConfig
     /** @var bool */
     protected $installFieldModule;
 
-    public function installFields(array $fieldNames, string $entityType, ?string $bundle = null): void
-    {
-        foreach ($fieldNames as $fieldName) {
-            $this->installField($fieldName, $entityType, $bundle);
-        }
-    }
-
     public function installField(string $fieldName, string $entityType, ?string $bundle = null): void
     {
         if (isset($this->installFieldModule) === false) {
@@ -39,13 +32,11 @@ trait InstallsExportedConfig
         ]);
     }
 
-    public function installAllFieldsForEntity(string $entityType, ?string $bundle = null): void
+    public function installFields(array $fieldNames, string $entityType, ?string $bundle = null): void
     {
-        $configStorage = new FileStorage($this->configDirectory());
-
-        $this->installFields(array_map(function ($storageFieldName) {
-            return substr($storageFieldName, strripos($storageFieldName, '.') + 1);
-        }, $configStorage->listAll("field.storage.$entityType")), $entityType, $bundle);
+        foreach ($fieldNames as $fieldName) {
+            $this->installField($fieldName, $entityType, $bundle);
+        }
     }
 
     public function installImageStyle(string $imageStyle): void
@@ -108,6 +99,15 @@ trait InstallsExportedConfig
         foreach ($vocabularies as $vocabulary) {
             $this->installVocabulary($vocabulary);
         }
+    }
+
+    public function installAllFieldsForEntity(string $entityType, ?string $bundle = null): void
+    {
+        $configStorage = new FileStorage($this->configDirectory());
+
+        $this->installFields(array_map(function ($storageFieldName) {
+            return substr($storageFieldName, strripos($storageFieldName, '.') + 1);
+        }, $configStorage->listAll("field.storage.$entityType")), $entityType, $bundle);
     }
 
     /** @param string|array $config */
