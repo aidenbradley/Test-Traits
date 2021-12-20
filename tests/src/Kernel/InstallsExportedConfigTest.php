@@ -3,6 +3,7 @@
 namespace Drupal\Tests\test_traits\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\node\Entity\NodeType;
 use Drupal\Tests\test_traits\Kernel\Concerns\InstallsExportedConfig;
 use Drupal\Tests\test_traits\Kernel\Exceptions\ConfigInstallFailed;
 
@@ -87,17 +88,22 @@ class InstallsExportedConfigTest extends KernelTestBase
 
         $this->assertEmpty($nodeTypeStorage->loadMultiple());
 
-        $this->installBundles('node', [
-            'page'
-        ]);
+        $bundlesToInstall = [
+            'page',
+            'news',
+        ];
+
+        $this->installBundles('node', $bundlesToInstall);
 
         $nodeTypes = $nodeTypeStorage->loadMultiple();
 
         $this->assertNotEmpty($nodeTypes);
 
-        $pageNodeType = reset($nodeTypes);
+        $nodeTypeIds = array_map(function(NodeType $nodeType) {
+            return $nodeType->id();
+        }, $nodeTypes);
 
-        $this->assertEquals('page', $pageNodeType->id());
+        $this->assertEquals($bundlesToInstall, array_values($nodeTypeIds));
     }
 
     /** @test */
