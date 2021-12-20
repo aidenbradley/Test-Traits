@@ -77,7 +77,7 @@ trait InstallsExportedConfig
         $this->installBundles($entityType, (array) $bundles);
     }
 
-    public function installExportedVocabulary(string $vocabularyName): void
+    public function installVocabulary(string $vocabularyName): void
     {
         $this->installExportedConfig([
             'taxonomy.vocabulary.' . $vocabularyName,

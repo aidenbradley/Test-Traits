@@ -120,6 +120,31 @@ class InstallsExportedConfigTest extends KernelTestBase
         $this->assertEquals('editor', $editorRole->id());
     }
 
+    /** @test */
+    public function install_vocabulary(): void
+    {
+        $this->enableModules([
+            'taxonomy',
+        ]);
+        $this->installEntitySchema('taxonomy_vocabulary');
+
+        $this->setConfigDirectory('taxonomy');
+
+        $vocabularyStorage = $this->container->get('entity_type.manager')->getStorage('taxonomy_vocabulary');
+
+        $this->assertEmpty($vocabularyStorage->loadMultiple());
+
+        $this->installVocabulary('tags');
+
+        $vocabularies = $vocabularyStorage->loadMultiple();
+
+        $this->assertNotEmpty($vocabularies);
+
+        $tagsVocabulary = reset($vocabularies);
+
+        $this->assertEquals('tags', $tagsVocabulary->id());
+    }
+
     /** sets the config directory relative to the fixtures route */
     public function setConfigDirectory(string $directory): void
     {
