@@ -8,10 +8,12 @@ use Drupal\Core\Queue\QueueInterface;
 trait InteractsWithQueues
 {
     /** @var \Symfony\Component\DependencyInjection\ContainerInterface */
-    protected $container;
+    private $container;
 
     /** @var array */
-    protected $queues = [];
+    private $queues = [];
+
+    private $useReliableQueues = false;
 
     public function getQueue(string $queueName): QueueInterface
     {
@@ -19,14 +21,16 @@ trait InteractsWithQueues
             return $this->queues[$queueName];
         }
 
-        $this->queues[$queueName] = $this->container->get('queue')->get($queueName);
+        $this->queues[$queueName] = $this->container->get('queue')->get($queueName, $this->useReliableQueues);
 
         return $this->queues[$queueName];
     }
 
-    public function addToQueue(string $queueName, $data): void
+    public function addToQueue(string $queueName, $data): self
     {
         $this->getQueue($queueName)->createItem($data);
+
+        return $this;
     }
 
     private function processQueue(string $queueName): void
@@ -43,5 +47,12 @@ trait InteractsWithQueues
             $queueWorker->processItem($item->data);
             $queue->deleteItem($item);
         }
+    }
+
+    public function useReliableQueues(): self
+    {
+        $this->useReliableQueues = true;
+
+        return $this;
     }
 }
