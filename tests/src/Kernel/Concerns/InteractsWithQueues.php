@@ -7,15 +7,13 @@ use Drupal\Core\Queue\QueueInterface;
 /** To be used in kernel tests */
 trait InteractsWithQueues
 {
-    /** @var \Symfony\Component\DependencyInjection\ContainerInterface */
-    private $container;
-
     /** @var array */
     private $queues = [];
 
+    /** @var bool */
     private $useReliableQueues = false;
 
-    public function getQueue(string $queueName): QueueInterface
+    public function getQueue(string $queueName): ?QueueInterface
     {
         if (isset($this->queues[$queueName])) {
             return $this->queues[$queueName];
