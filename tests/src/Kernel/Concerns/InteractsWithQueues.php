@@ -29,15 +29,11 @@ trait InteractsWithQueues
         $this->getQueue($queueName)->createItem($data);
     }
 
-    private function processQueue(string $queueName, ?string $queueWorker = null): void
+    private function processQueue(string $queueName): void
     {
-        if ($queueWorker === null) {
-            $queueWorker = $queueName;
-        }
-
         $queue = $this->getQueue($queueName);
 
-        $queueWorker = $this->container->get('plugin.manager.queue_worker')->createInstance($queueWorker);
+        $queueWorker = $this->container->get('plugin.manager.queue_worker')->createInstance($queueName);
 
         while ($item = $queue->claimItem()) {
             if ($item instanceof \stdClass === false) {
