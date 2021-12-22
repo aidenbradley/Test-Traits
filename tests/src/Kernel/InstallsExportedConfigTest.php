@@ -17,7 +17,6 @@ class InstallsExportedConfigTest extends KernelTestBase
     }
 
     protected static $modules = [
-        'test_traits',
         'system',
         'node',
         'user',

@@ -9,10 +9,6 @@ class InstallsThemeTest extends KernelTestBase
 {
     use InstallsTheme;
 
-    protected static $modules = [
-        'test_traits',
-    ];
-
     protected $strictConfigSchema = false;
 
     /** @test */
