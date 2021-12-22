@@ -12,6 +12,6 @@ class InteractsWithQueuesTest extends KernelTestBase
     /** @test */
     public function get_queue(): void
     {
-
+        $this->getQueue()
     }
 }

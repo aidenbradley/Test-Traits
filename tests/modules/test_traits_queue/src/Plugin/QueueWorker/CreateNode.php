@@ -9,8 +9,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * @QueueWorker(
- *   id = "membership_reminders",
- *   title = @Translation("Sends reminder emails for members"),
+ *   id = "create_node_worker",
+ *   title = @Translation("Creates nodes based on the title data stored in the queue"),
  *   cron = {"time" = 10}
  * )
  */
