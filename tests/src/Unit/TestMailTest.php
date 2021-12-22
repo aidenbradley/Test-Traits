@@ -78,8 +78,8 @@ class TestMailTest extends UnitTestCase
             ],
         ]);
 
-        $this->assertEquals('mail message', $mail->getParam('message'));
-        $this->assertEquals('arbitrary value', $mail->getParam('article_title'));
+        $this->assertEquals('mail message', $mail->getParameter('message'));
+        $this->assertEquals('arbitrary value', $mail->getParameter('article_title'));
     }
 
     /** @test */
@@ -97,9 +97,9 @@ class TestMailTest extends UnitTestCase
             ],
         ]);
 
-        $mail->assertParam('message', 'mail message');
-        $mail->assertParam('article_title', 'arbitrary value');
-        $mail->assertParam('user', $user->reveal(), function(User $user) {
+        $mail->assertParameter('message', 'mail message');
+        $mail->assertParameter('article_title', 'arbitrary value');
+        $mail->assertParameter('user', $user->reveal(), function(User $user) {
             $this->assertEquals('hello@example.com', $user->getEmail());
         });
     }

@@ -57,7 +57,7 @@ class TestMail
     }
 
     /** @return mixed */
-    public function getParam(string $param)
+    public function getParameter(string $param)
     {
         if (isset($this->values['params'][$param]) === false) {
             return null;
@@ -71,9 +71,9 @@ class TestMail
      *
      * The closure will pass back the value attributed to the given parameter
      */
-    public function assertParam(string $parameter, $value, ?\Closure $assertionCallback = null): self
+    public function assertParameter(string $parameter, $value, ?\Closure $assertionCallback = null): self
     {
-        $paramValue = $this->getParam($parameter);
+        $paramValue = $this->getParameter($parameter);
 
         Assert::assertEquals($value, $paramValue);
 
