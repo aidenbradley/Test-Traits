@@ -17,9 +17,7 @@ trait InstallsModules
     public function installModuleWithDependencies($modules): void
     {
         foreach ((array) $modules as $module) {
-            $modulesToEnable = [];
-
-            $fileLocation = $this->getModulePath($module) . '/' . $module . '.info.yml';
+            $fileLocation = drupal_get_path('module', $module) . '/' . $module . '.info.yml';
 
             $infoYaml = Yaml::decode(file_get_contents($fileLocation));
 
@@ -35,10 +33,5 @@ trait InstallsModules
 
             $this->enableModules(array_merge((array) $module, $cleanedDependencies));
         }
-    }
-
-    public function getModulePath(string $module): string
-    {
-        return \Drupal::service('app.root') . '/modules/custom/' . $module;
     }
 }
