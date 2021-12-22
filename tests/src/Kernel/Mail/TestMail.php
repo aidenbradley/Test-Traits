@@ -35,11 +35,11 @@ class TestMail
     /** @return mixed */
     public function getParam(string $param)
     {
-        if (isset($this['params'][$param]) === false) {
+        if (isset($this->values['params'][$param]) === false) {
             return null;
         }
 
-        return $this['params'][$param];
+        return $this->values['params'][$param];
     }
 
     public function toArray(): array
