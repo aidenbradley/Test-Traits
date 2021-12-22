@@ -403,7 +403,7 @@ class InstallsExportedConfigTest extends KernelTestBase
         $this->assertTrue($node->hasField('field_boolean_field'));
     }
 
-    /** sets the config directory relative to the fixtures route */
+    /** sets the config directory relative to the __fixtures__ directory */
     public function setConfigDirectory(string $directory): void
     {
         $this->customConfigDirectory = $directory;
