@@ -2,7 +2,7 @@
 
 namespace Drupal\Tests\test_traits\Kernel\Concerns;
 
-use Drupal\Tests\test_traits\Kernel\TestResponse;
+use Drupal\Tests\test_traits\Kernel\Response\TestResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 

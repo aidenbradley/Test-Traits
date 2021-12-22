@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Tests\test_traits\Kernel;
+namespace Drupal\Tests\test_traits\Kernel\Response;
 
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Response;
