@@ -66,7 +66,11 @@ class TestMail
         return $this->values['params'][$param];
     }
 
-    /** @param mixed $value */
+    /**
+     * @param mixed $value
+     *
+     * The closure will pass back the value attributed to the given parameter
+     */
     public function assertParam(string $parameter, $value, ?\Closure $assertionCallback = null): self
     {
         $paramValue = $this->getParam($parameter);
