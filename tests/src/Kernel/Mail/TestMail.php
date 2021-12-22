@@ -2,6 +2,8 @@
 
 namespace Drupal\Tests\test_traits\Kernel\Mail;
 
+use PHPUnit\Framework\Assert;
+
 class TestMail
 {
     /** @var array */
@@ -22,14 +24,36 @@ class TestMail
         return $this->getValue('to');
     }
 
+    public function assertSentTo(string $to): self
+    {
+        Assert::assertEquals($to, $this->getTo());
+
+        return $this;
+    }
+
     public function getSubject(): ?string
     {
         return $this->getValue('subject');
     }
 
+    public function assertSubject(string $subject): self
+    {
+        Assert::assertEquals($subject, $this->getSubject());
+
+        return $this;
+    }
+
     public function getBody(): ?string
     {
         return $this->getValue('body');
+    }
+
+    /** @param mixed body */
+    public function assertBody($body): self
+    {
+        Assert::assertEquals($body, $this->getBody());
+
+        return $this;
     }
 
     /** @return mixed */
@@ -40,6 +64,20 @@ class TestMail
         }
 
         return $this->values['params'][$param];
+    }
+
+    /** @param mixed $value */
+    public function assertParam(string $parameter, $value, ?\Closure $assertionCallback = null): self
+    {
+        $paramValue = $this->getParam($parameter);
+
+        Assert::assertEquals($value, $paramValue);
+
+        if ($assertionCallback !== null) {
+            $assertionCallback($paramValue);
+        }
+
+        return $this;
     }
 
     public function toArray(): array

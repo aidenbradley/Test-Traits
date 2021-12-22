@@ -4,6 +4,7 @@ namespace Drupal\Tests\test_traits\Unit;
 
 use Drupal\Tests\test_traits\Kernel\Mail\TestMail;
 use Drupal\Tests\UnitTestCase;
+use Drupal\user\Entity\User;
 
 class TestMailTest extends UnitTestCase
 {
@@ -18,6 +19,16 @@ class TestMailTest extends UnitTestCase
     }
 
     /** @test */
+    public function assert_mail_sent_to(): void
+    {
+        $mail = TestMail::createFromValues([
+            'to' => 'hello@example.com',
+        ]);
+
+        $mail->assertSentTo('hello@example.com');
+    }
+
+    /** @test */
     public function get_subject(): void
     {
         $mail = TestMail::createFromValues([
@@ -28,6 +39,16 @@ class TestMailTest extends UnitTestCase
     }
 
     /** @test */
+    public function assert_subject(): void
+    {
+        $mail = TestMail::createFromValues([
+            'subject' => 'email subject',
+        ]);
+
+        $mail->assertSubject('email subject');
+    }
+
+    /** @test */
     public function get_body(): void
     {
         $mail = TestMail::createFromValues([
@@ -35,6 +56,16 @@ class TestMailTest extends UnitTestCase
         ]);
 
         $this->assertEquals('email body', $mail->getBody());
+    }
+
+    /** @test */
+    public function assert_body(): void
+    {
+        $mail = TestMail::createFromValues([
+            'body' => 'email body',
+        ]);
+
+        $mail->assertBody('email body');
     }
 
     /** @test */
@@ -49,5 +80,27 @@ class TestMailTest extends UnitTestCase
 
         $this->assertEquals('mail message', $mail->getParam('message'));
         $this->assertEquals('arbitrary value', $mail->getParam('article_title'));
+    }
+
+    /** @test */
+    public function assert_param(): void
+    {
+        $user = $this->prophesize(User::class);
+        $user->id()->willReturn(1);
+        $user->getEmail()->willReturn('hello@example.com');
+
+        $mail = TestMail::createFromValues([
+            'params' => [
+                'message' => 'mail message',
+                'article_title' => 'arbitrary value',
+                'user' => $user->reveal(),
+            ],
+        ]);
+
+        $mail->assertParam('message', 'mail message');
+        $mail->assertParam('article_title', 'arbitrary value');
+        $mail->assertParam('user', $user->reveal(), function(User $user) {
+            $this->assertEquals('hello@example.com', $user->getEmail());
+        });
     }
 }
