@@ -14,6 +14,12 @@ class InteractsWithMailTest extends KernelTestBase
 
     private const SEND_MAIL = true;
 
+    private const NO_REPLY = null;
+
+    protected static $modules = [
+        'test_traits_mail',
+    ];
+
     protected function setUp()
     {
         parent::setUp();
@@ -26,9 +32,7 @@ class InteractsWithMailTest extends KernelTestBase
     {
         $this->assertEmpty($this->getSentMail());
 
-        $this->sendMail('hello@example.com', [
-            'message' => 'Hello, at example.com',
-        ]);
+        $this->sendMail('hello@example.com', 'Hello', 'Hello, at example.com');
 
         $this->assertNotEmpty($this->getSentMail());
     }
@@ -38,11 +42,33 @@ class InteractsWithMailTest extends KernelTestBase
     {
         $this->assertEquals(0, $this->countMailSent());
 
-        $this->sendMail('hello@example.com', [
-            'message' => 'Hello, at example.com',
-        ]);
+        $this->sendMail('hello@example.com', 'Hello', 'Hello, at example.com');
 
         $this->assertEquals(1, $this->countMailSent());
+    }
+
+    /** @test */
+    public function sent_mail_contains_to_address(): void
+    {
+        $this->assertFalse(
+            $this->sentMailContainsToAddress('hello@example.com')
+        );
+
+        $this->sendMail('hello@example.com', 'Hello', 'Hello, at example.com');
+
+        $this->assertTrue(
+            $this->sentMailContainsToAddress('hello@example.com')
+        );
+    }
+
+    /** @test */
+    public function get_mail_with_subject(): void
+    {
+        $this->assertEmpty($this->getMailWithSubject('User Registration'));
+
+        $this->sendMail('hello@example.com', 'User Registration', 'Thanks for registering!');
+
+        $this->assertNotEmpty($this->getMailWithSubject('User Registration'));
     }
 
     /** @test */
@@ -50,9 +76,7 @@ class InteractsWithMailTest extends KernelTestBase
     {
         $this->assertEmpty($this->getMailSentTo('hello@example.com'));
 
-        $this->sendMail('hello@example.com', [
-            'message' => 'Hello, at example.com',
-        ]);
+        $this->sendMail('hello@example.com', 'Hello', 'Hello, at example.com');
 
         $this->assertNotEmpty($this->getMailSentTo('hello@example.com'));
     }
@@ -62,9 +86,7 @@ class InteractsWithMailTest extends KernelTestBase
     {
         $this->assertEmpty($this->getSentMail());
 
-        $this->sendMail('hello@example.com', [
-            'message' => 'Hello, at example.com',
-        ]);
+        $this->sendMail('hello@example.com', 'Hello', 'Hello, at example.com');
 
         $this->assertNotEmpty($this->getSentMail());
 
@@ -73,8 +95,21 @@ class InteractsWithMailTest extends KernelTestBase
         $this->assertEmpty($this->getSentMail());
     }
 
-    private function sendMail(string $to, array $params): void
+    private function sendMail(string $to, string $subject, string $body, array $params = []): void
     {
-        $this->mailManager->mail('test_traits', 'send_email', $to, 'en', $params, null, static::SEND_MAIL);
+        $state = $this->container->get('state');
+
+        $state->set('test_traits.mail_subject', $subject);
+        $state->set('test_traits.mail_body', $body);
+
+        $this->mailManager->mail(
+            'test_traits_mail',
+            'test_traits_mail',
+            $to,
+            'en',
+            $params,
+            static::NO_REPLY,
+            static::SEND_MAIL
+        );
     }
 }

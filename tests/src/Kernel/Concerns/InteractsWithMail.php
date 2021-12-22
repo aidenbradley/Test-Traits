@@ -2,7 +2,7 @@
 
 namespace Drupal\Tests\test_traits\Kernel\Concerns;
 
-use Drupal\helpers\Tests\TestMail;
+use Drupal\Tests\test_traits\Kernel\Mail\TestMail;
 
 trait InteractsWithMail
 {
@@ -10,7 +10,13 @@ trait InteractsWithMail
     {
         $mail = \Drupal::state()->get('system.test_mail_collector');
 
-        return collect($mail)->mapInto(TestMail::class)->toArray();
+        if ($mail === null) {
+            return [];
+        }
+
+        return array_map(function(array $mailData) {
+            return TestMail::createFromValues($mailData);
+        }, $mail);
     }
 
     public function countMailSent(): int
@@ -34,7 +40,7 @@ trait InteractsWithMail
         return $sentMail;
     }
 
-    public function sentMailContainsTo(string $mailTo): bool
+    public function sentMailContainsToAddress(string $mailTo): bool
     {
         /** @var TestMail $mail */
         foreach ($this->getSentMail() as $mail) {

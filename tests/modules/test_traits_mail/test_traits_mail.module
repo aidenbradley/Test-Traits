@@ -1,0 +1,11 @@
+<?php
+
+function test_traits_mail_mail($key, &$message): void
+{
+    if ($key !== 'test_traits_mail') {
+        return;
+    }
+
+    $message['subject'] = \Drupal::state()->get('test_traits.mail_subject');
+    $message['body'][] = \Drupal::state()->get('test_traits.mail_body');
+}
