@@ -403,7 +403,7 @@ class InstallsExportedConfigTest extends KernelTestBase
     }
 
     /** sets the config directory relative to the __fixtures__ directory */
-    public function setConfigDirectory(string $directory): void
+    private function setConfigDirectory(string $directory): void
     {
         $this->customConfigDirectory = $directory;
     }
