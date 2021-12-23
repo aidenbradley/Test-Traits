@@ -31,7 +31,9 @@ class InstallModuleTest extends EnableModuleKernelTest
 
             $this->fail('The entity schema should fail to install. Read the test comment for more information');
         } catch (PluginNotFoundException $exception) {
-            // silence is golden
+            $this->assertTrue(
+                str_contains($exception->getMessage(), 'The "text" plugin does not exist')
+            );
         }
 
         $this->installModuleWithDependencies($this->module());
