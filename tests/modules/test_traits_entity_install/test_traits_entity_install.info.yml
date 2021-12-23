@@ -1,0 +1,9 @@
+name: Test Traits Entity Install
+type: module
+description: 'Supporting module for the Test Traits module'
+package: Custom
+version: VERSION
+hidden: true
+core_version_requirement: ^8 || ^9
+dependencies:
+  - text

@@ -34,4 +34,11 @@ trait InstallsModules
             $this->enableModules(array_merge((array) $module, $cleanedDependencies));
         }
     }
+
+    public function installModulesWithDependencies(array $modules): void
+    {
+        foreach($modules as $module) {
+            $this->installModuleWithDependencies($module);
+        }
+    }
 }
