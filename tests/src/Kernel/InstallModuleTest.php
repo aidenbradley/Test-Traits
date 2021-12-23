@@ -38,10 +38,23 @@ class InstallModuleTest extends EnableModuleKernelTest
 
         $this->installModuleWithDependencies($this->module());
 
+
         try {
             $this->installEntitySchema('test_install_entity');
-        } catch (PluginNotFoundException $exception) {
-            $this->fail('The entity schema should correctly install. Read the test comment for more information');
+        } catch (\Exception $exception) {
+            $this->convertExceptionToFailMessage($exception);
         }
+    }
+
+    // Would be nice if we could provide a more informative failure messages, something the developer can act on
+    private function convertExceptionToFailMessage(\Exception $exception): void
+    {
+        $additionalMessage = '';
+
+        if ($exception instanceof PluginNotFoundException) {
+            $additionalMessage = 'You may be missing a dependency on your module';
+        }
+
+        $this->fail($additionalMessage . '. ' . $exception->getMessage());
     }
 }
