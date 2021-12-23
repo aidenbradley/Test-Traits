@@ -35,10 +35,12 @@ class InstallsExportedConfigTest extends KernelTestBase
 
         $this->installEntitySchema('node');
 
-        $this->expectException(ConfigInstallFailed::class);
-        $this->expectExceptionCode(ConfigInstallFailed::CONFIGURATION_DOES_NOT_EXIST);
-
-        $this->installExportedConfig('node.type.page');
+        try {
+            $this->installExportedConfig('node.type.page');
+        } catch (ConfigInstallFailed $exception) {
+            $this->assertEquals(ConfigInstallFailed::CONFIGURATION_DOES_NOT_EXIST, $exception->getCode());
+            $this->assertEquals('node.type.page', $exception->getFailingConfigFile());
+        }
     }
 
     /** @test */
