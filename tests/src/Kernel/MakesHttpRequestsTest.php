@@ -11,7 +11,7 @@ class MakesHttpRequestsTest extends KernelTestBase
     use MakesHttpRequests;
 
     protected static $modules = [
-        'test_traits_test',
+        'test_traits_http',
     ];
 
     /** @test */

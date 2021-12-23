@@ -1,8 +1,8 @@
 <?php
 
-namespace Drupal\test_traits_test\Routing;
+namespace Drupal\test_traits_http\Routing;
 
-use Drupal\test_traits_test\Controller\ResolveRequest;
+use Drupal\test_traits_http\Controller\ResolveRequest;
 use Symfony\Component\Routing\Route;
 
 class TestRoutes
