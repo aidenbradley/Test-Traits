@@ -24,7 +24,7 @@ abstract class EnableModuleKernelTest extends KernelTestBase
     abstract public function module(): string;
 
     /** @test */
-    public function install_module_definitions(): void
+    public function install_module_entity_definitions(): void
     {
         $this->installModuleWithDependencies($this->module());
 
