@@ -137,7 +137,7 @@ trait InstallsExportedConfig
         }
     }
 
-    public function configDirectory(): string
+    protected function configDirectory(): string
     {
         return Settings::get('config_sync_directory');
     }

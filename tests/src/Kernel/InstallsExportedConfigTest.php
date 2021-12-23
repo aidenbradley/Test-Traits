@@ -402,13 +402,7 @@ class InstallsExportedConfigTest extends KernelTestBase
         $this->assertTrue($node->hasField('field_boolean_field'));
     }
 
-    /** sets the config directory relative to the __fixtures__ directory */
-    private function setConfigDirectory(string $directory): void
-    {
-        $this->customConfigDirectory = $directory;
-    }
-
-    public function configDirectory(): string
+    protected function configDirectory(): string
     {
         if ($this->useVfsConfigDirectory) {
             return $this->InstallsExportedConfigDirectory();
@@ -422,5 +416,11 @@ class InstallsExportedConfigTest extends KernelTestBase
 
         // providing our own directory with config we can test against
         return $baseConfigPath;
+    }
+
+    /** sets the config directory relative to the __fixtures__ directory */
+    private function setConfigDirectory(string $directory): void
+    {
+        $this->customConfigDirectory = $directory;
     }
 }
