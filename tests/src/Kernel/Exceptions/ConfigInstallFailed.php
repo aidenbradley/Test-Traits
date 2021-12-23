@@ -11,7 +11,7 @@ class ConfigInstallFailed extends \Exception
     {
         return new static(
             'Configuration file ' . $configFile . ' does not exist',
-            static::CONFIGURATION_DOES_NOT_EXIST
+            self::CONFIGURATION_DOES_NOT_EXIST
         );
     }
 }
