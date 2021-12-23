@@ -43,10 +43,13 @@ class InteractsWithQueuesTest extends KernelTestBase
 
         $this->assertNotEmpty($nodeStorage->loadMultiple());
 
-        $node = $nodeStorage->loadByProperties([
+        $nodes = $nodeStorage->loadByProperties([
             'title' => 'test title',
         ]);
 
-        $this->assertInstanceOf(Node::class, reset($node));
+        $node = reset($nodes);
+
+        $this->assertInstanceOf(Node::class, $node);
+        $this->assertEquals('test title', $node->title->value);
     }
 }
