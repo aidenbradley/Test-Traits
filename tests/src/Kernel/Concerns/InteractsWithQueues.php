@@ -53,4 +53,11 @@ trait InteractsWithQueues
 
         return $this;
     }
+
+    public function dontUseReliableQueues(): self
+    {
+        $this->useReliableQueues = false;
+
+        return $this;
+    }
 }
