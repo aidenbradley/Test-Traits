@@ -6,10 +6,7 @@ use Drupal\Core\Config\FileStorage;
 use Drupal\Core\Site\Settings;
 use Drupal\Tests\test_traits\Kernel\Exceptions\ConfigInstallFailed;
 
-/**
- * This trait may be used to test fields stored as field configs
- * Your test may need ::$strictConfigSchema = false; to work
- */
+/** This trait may be used to test fields stored as field configs */
 trait InstallsExportedConfig
 {
     /** @var array */
