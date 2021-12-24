@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\test_traits\Kernel;
 
+use Drupal\Core\Queue\DatabaseQueue;
 use Drupal\Core\Queue\QueueFactory;
 use Drupal\Core\Queue\QueueInterface;
 use Drupal\Core\Site\Settings;
@@ -13,6 +14,34 @@ use Drupal\Tests\test_traits\Kernel\Concerns\InteractsWithQueues;
 class InteractsWithQueuesTest extends KernelTestBase
 {
     use InteractsWithQueues;
+
+    /** @test */
+    public function get_queue(): void
+    {
+        $this->enableModules([
+            'test_traits_queue',
+        ]);
+
+        $this->assertInstanceOf(
+            DatabaseQueue::class,
+            $this->getQueue('create_node_worker')
+        );
+    }
+
+    /** @test */
+    public function get_reliable_queue(): void
+    {
+        $this->enableModules([
+            'test_traits_queue',
+        ]);
+
+        $this->container->set('queue', $this->customQueueFactory());
+
+        $this->assertInstanceOf(
+            ReliableCreateNodeQueue::class,
+            $this->getReliableQueue('create_node_worker')
+        );
+    }
 
     /** @test */
     public function add_to_queue(): void
@@ -55,21 +84,6 @@ class InteractsWithQueuesTest extends KernelTestBase
 
         $this->assertInstanceOf(Node::class, $node);
         $this->assertEquals('test title', $node->title->value);
-    }
-
-    /** @test */
-    public function reliable_queues(): void
-    {
-        $this->enableModules([
-            'test_traits_queue',
-        ]);
-
-        $this->container->set('queue', $this->customQueueFactory());
-
-        $this->assertInstanceOf(
-            ReliableCreateNodeQueue::class,
-            $this->useReliableQueues()->getQueue('create_node_worker')
-        );
     }
 
     /** @return mixed */

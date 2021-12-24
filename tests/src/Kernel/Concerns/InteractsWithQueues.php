@@ -11,17 +11,19 @@ trait InteractsWithQueues
     private $queues = [];
 
     /** @var bool */
-    private $useReliableQueues = false;
+    private $useReliableQueue = true;
 
-    public function getQueue(string $queueName): ?QueueInterface
+    /** @var bool */
+    private $dontUseReliableQueue = false;
+
+    public function getQueue(string $queueName): QueueInterface
     {
-        if (isset($this->queues[$queueName])) {
-            return $this->queues[$queueName];
-        }
+        return $this->getQueueByName($queueName, $this->dontUseReliableQueue);
+    }
 
-        $this->queues[$queueName] = $this->container->get('queue')->get($queueName, $this->useReliableQueues);
-
-        return $this->queues[$queueName];
+    public function getReliableQueue(string $queueName): QueueInterface
+    {
+        return $this->getQueueByName($queueName, $this->useReliableQueue);
     }
 
     public function addToQueue(string $queueName, $data): self
@@ -31,7 +33,7 @@ trait InteractsWithQueues
         return $this;
     }
 
-    private function processQueue(string $queueName): void
+    public function processQueue(string $queueName): void
     {
         $queue = $this->getQueue($queueName);
 
@@ -59,5 +61,16 @@ trait InteractsWithQueues
         $this->useReliableQueues = false;
 
         return $this;
+    }
+
+    private function getQueueByName(string $queueName, bool $useReliableQueue): QueueInterface
+    {
+        if (isset($this->queues[$queueName])) {
+            return $this->queues[$queueName];
+        }
+
+        $this->queues[$queueName] = $this->container->get('queue')->get($queueName, $useReliableQueue);
+
+        return $this->queues[$queueName];
     }
 }
