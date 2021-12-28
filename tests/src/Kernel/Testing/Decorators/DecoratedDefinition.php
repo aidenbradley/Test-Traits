@@ -90,9 +90,14 @@ class DecoratedDefinition
         return $this->getProvider() === $module;
     }
 
+    public function getClass(): ?string
+    {
+        return $this->definition->getClass();
+    }
+
     public function isClass(string $class): bool
     {
-        return $this->definition->getClass() === $class;
+        return $this->getClass() === $class;
     }
 
     /** @return mixed */

@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\test_traits\Kernel;
 
+use Drupal\Core\Routing\RoutingEvents;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\EventSubscriber\ConfigSubscriber;
 use Drupal\node\Routing\RouteSubscriber;
@@ -142,5 +143,31 @@ class WithoutEventsTest extends KernelTestBase
 
         $this->assertFalse($this->container->hasDefinition('node.route_subscriber'));
         $this->assertFalse($this->container->hasDefinition('language.config_subscriber'));
+    }
+
+    /** @test */
+    public function without_events_listening_for(): void
+    {
+        $this->enableModules([
+            'node',
+        ]);
+
+        $this->assertTrue($this->container->hasDefinition('node.route_subscriber'));
+
+        $this->withoutEventsListeningFor(RoutingEvents::ALTER);
+
+        $this->assertFalse($this->container->hasDefinition('node.route_subscriber'));
+    }
+
+    /** @test */
+    public function remove_events_by_subscribed_event_after_enabling_modules(): void
+    {
+        $this->withoutEventsListeningFor(RoutingEvents::ALTER);
+
+        $this->enableModules([
+            'node',
+        ]);
+
+        $this->assertFalse($this->container->hasDefinition('node.route_subscriber'));
     }
 }

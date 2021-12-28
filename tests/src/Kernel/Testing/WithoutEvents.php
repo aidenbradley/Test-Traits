@@ -18,6 +18,12 @@ trait WithoutEvents
     /** @var array */
     private $withoutEventsFromClasses = [];
 
+    /** @var array */
+    private $withoutEventsListeningFor = [];
+
+    /**
+     * Prevents any events from triggering.
+     */
     public function withoutEvents(): self
     {
         $this->ignoreAllEvents = true;
@@ -79,6 +85,30 @@ trait WithoutEvents
         return $this;
     }
 
+    /** @param string|array $eventNames */
+    public function withoutEventsListeningFor($eventNames): self
+    {
+        foreach ((array)$eventNames as $eventName) {
+            $this->withoutEventsListeningFor[$eventName] = $eventName;
+
+            foreach ($this->getDecoratedDefinitions() as $definition) {
+                if (method_exists($definition->getClass(), 'getSubscribedEvents') === false) {
+                    continue;
+                }
+
+                $subscribedEvents = $definition->getClass()::getSubscribedEvents();
+
+                if (in_array($eventName, array_keys($subscribedEvents)) === false) {
+                    continue;
+                }
+
+                $this->container->removeDefinition($definition->getServiceId());
+            }
+        }
+
+        return $this;
+    }
+
     /** @return DecoratedDefinition[] */
     private function getDecoratedDefinitions(): array
     {
@@ -117,6 +147,10 @@ trait WithoutEvents
 
         if (isset($this->withoutEventsFromClasses)) {
             $this->withoutEventsFromClasses($this->withoutEventsFromClasses);
+        }
+
+        if (isset($this->withoutEventsListeningFor)) {
+            $this->withoutEventsListeningFor($this->withoutEventsListeningFor);
         }
     }
 }
