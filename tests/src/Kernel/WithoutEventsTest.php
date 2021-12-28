@@ -22,6 +22,20 @@ class WithoutEventsTest extends KernelTestBase
     }
 
     /** @test */
+    public function globally_ignores_events_after_enabling_module(): void
+    {
+        $this->withoutEvents();
+
+        $this->enableModules([
+            'language',
+            'node',
+        ]);
+
+        $this->assertFalse($this->container->hasDefinition('node.route_subscriber'));
+        $this->assertFalse($this->container->hasDefinition('language.config_subscriber'));
+    }
+
+    /** @test */
     public function without_events_from_module(): void
     {
         $eventSubscribersBeforeEnable = array_keys(
@@ -80,6 +94,23 @@ class WithoutEventsTest extends KernelTestBase
     }
 
     /** @test */
+    public function removes_events_by_module_after_enabling_module(): void
+    {
+        $this->withoutEventsFromModules([
+            'language',
+            'node',
+        ]);
+
+        $this->enableModules([
+            'language',
+            'node',
+        ]);
+
+        $this->assertFalse($this->container->hasDefinition('node.route_subscriber'));
+        $this->assertFalse($this->container->hasDefinition('language.config_subscriber'));
+    }
+
+    /** @test */
     public function without_events_class_list(): void
     {
         $this->enableModules([
@@ -90,6 +121,23 @@ class WithoutEventsTest extends KernelTestBase
         $this->withoutEventsFromClasses([
             RouteSubscriber::class, // node.route_subscriber
             ConfigSubscriber::class, // language.config_subscriber
+        ]);
+
+        $this->assertFalse($this->container->hasDefinition('node.route_subscriber'));
+        $this->assertFalse($this->container->hasDefinition('language.config_subscriber'));
+    }
+
+    /** @test */
+    public function removes_events_by_class_after_enabling_module(): void
+    {
+        $this->withoutEventsFromClasses([
+            RouteSubscriber::class, // node.route_subscriber
+            ConfigSubscriber::class, // language.config_subscriber
+        ]);
+
+        $this->enableModules([
+            'language',
+            'node',
         ]);
 
         $this->assertFalse($this->container->hasDefinition('node.route_subscriber'));

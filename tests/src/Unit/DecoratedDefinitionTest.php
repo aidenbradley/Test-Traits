@@ -130,23 +130,16 @@ class DecoratedDefinitionTest extends UnitTestCase
     }
 
     /** @test */
-    public function in_class_list(): void
+    public function is_class(): void
     {
         $definition = $this->createDefinitionWithoutProvider();
         $definition->getClass()->willReturn('Drupal\my_module\Class');
 
         $decoratorWithoutProvider = DecoratedDefinition::createFromDefinition($definition->reveal());
 
-        $this->assertFalse($decoratorWithoutProvider->classInList([
-            'Drupal\my_module\FirstClass',
-            'Drupal\my_module\SecondClass',
-        ]));
+        $this->assertFalse($decoratorWithoutProvider->isClass('Drupal\my_module\FirstClass'));
 
-        $this->assertTrue($decoratorWithoutProvider->classInList([
-            'Drupal\my_module\Class',
-            'Drupal\my_module\FirstClass',
-            'Drupal\my_module\SecondClass',
-        ]));
+        $this->assertTrue($decoratorWithoutProvider->isClass('Drupal\my_module\Class'));
     }
 
     private function createDefinitionWithoutProvider(): ObjectProphecy

@@ -2,14 +2,26 @@
 
 namespace Drupal\Tests\test_traits\Kernel\Testing;
 
-// needs to listen for modules being enabled during test runs so
-// we can collate any new subscribers
 use Drupal\Tests\test_traits\Kernel\Testing\Decorators\DecoratedDefinition;
 
 trait WithoutEvents
 {
+    /** @var array */
+    private $decoratedDefinitions = [];
+
+    /** @var bool */
+    private $ignoreAllEvents = false;
+
+    /** @var array */
+    private $withoutEventsFromModules = [];
+
+    /** @var array */
+    private $withoutEventsFromClasses = [];
+
     public function withoutEvents(): self
     {
+        $this->ignoreAllEvents = true;
+
         $subscribers = $this->container->findTaggedServiceIds('event_subscriber');
 
         foreach (array_keys($subscribers) as $subscriberName) {
@@ -21,6 +33,8 @@ trait WithoutEvents
 
     public function withoutEventsFromModule(string $module): self
     {
+        $this->withoutEventsFromModules[$module] = $module;
+
         foreach ($this->getDecoratedDefinitions() as $definition) {
             if ($definition->hasProvider() && $definition->providerIs($module) === false) {
                 continue;
@@ -41,10 +55,12 @@ trait WithoutEvents
         return $this;
     }
 
-    public function withoutEventsFromClasses(array $classes): self
+    public function withoutEventFromClass(string $class): self
     {
+        $this->withoutEventsFromClasses[$class] = $class;
+
         foreach ($this->getDecoratedDefinitions() as $definition) {
-            if ($definition->classInList($classes) === false) {
+            if ($definition->isClass($class) === false) {
                 continue;
             }
 
@@ -54,20 +70,53 @@ trait WithoutEvents
         return $this;
     }
 
+    public function withoutEventsFromClasses(array $classes): self
+    {
+        foreach ($classes as $class) {
+            $this->withoutEventFromClass($class);
+        }
+
+        return $this;
+    }
+
     /** @return DecoratedDefinition[] */
     private function getDecoratedDefinitions(): array
     {
+        if (isset($this->decoratedDefinitions)) {
+            return $this->decoratedDefinitions;
+        }
+
         $subscriberNames = array_keys($this->container->findTaggedServiceIds('event_subscriber'));
 
-        return array_map(function(string $subscriberName) {
+        $this->decoratedDefinitions = array_map(function (string $subscriberName) {
             return DecoratedDefinition::createFromDefinition(
                 $this->container->getDefinition($subscriberName)
             );
         }, $subscriberNames);
+
+        return $this->decoratedDefinitions;
     }
 
-//    protected function enableModules(array $modules): void
-//    {
-//
-//    }
+    protected function enableModules(array $modules): void
+    {
+        parent::enableModules($modules);
+
+        $this->decoratedDefinitions = null;
+
+        if ($this->ignoreAllEvents) {
+            $this->withoutEvents();
+        }
+
+        foreach ($modules as $module) {
+            if (isset($this->withoutEventsFromModules[$module]) === false) {
+                continue;
+            }
+
+            $this->withoutEventsFromModule($module);
+        }
+
+        if (isset($this->withoutEventsFromClasses)) {
+            $this->withoutEventsFromClasses($this->withoutEventsFromClasses);
+        }
+    }
 }
