@@ -19,6 +19,40 @@ class DecoratedDefinition
         $this->definition = $definition;
     }
 
+    public function hasProperties(): bool
+    {
+        return $this->definition->getProperties() !== [];
+    }
+
+    public function getProperties(): array
+    {
+        return $this->definition->getProperties();
+    }
+
+    public function hasServiceid(): bool
+    {
+        if ($this->hasProperties() === false) {
+            return false;
+        }
+
+        $properties = $this->getProperties();
+
+        if (isset($properties['_serviceId']) === false || $properties['_serviceId'] === '') {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function getServiceId(): ?string
+    {
+        if ($this->hasServiceId() === false) {
+            return null;
+        }
+
+        return $this->getProperties()['_serviceId'];
+    }
+
     public function hasProvider(): bool
     {
         $tags = $this->definition->getTags();

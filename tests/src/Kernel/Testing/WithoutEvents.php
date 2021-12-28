@@ -21,18 +21,12 @@ trait WithoutEvents
 
     public function withoutEventsFromModule(string $module): self
     {
-        $subscribers = $this->container->findTaggedServiceIds('event_subscriber');
-
-        foreach (array_keys($subscribers) as $subscriberName) {
-            $definition = DecoratedDefinition::createFromDefinition(
-                $this->container->getDefinition($subscriberName)
-            );
-
+        foreach ($this->getDecoratedDefinitions() as $definition) {
             if ($definition->hasProvider() && $definition->providerIs($module) === false) {
                 continue;
             }
 
-            $this->container->removeDefinition($subscriberName);
+            $this->container->removeDefinition($definition->getServiceId());
         }
 
         return $this;
@@ -49,20 +43,31 @@ trait WithoutEvents
 
     public function withoutEventsFromClasses(array $classes): self
     {
-        $subscribers = $this->container->findTaggedServiceIds('event_subscriber');
-
-        foreach (array_keys($subscribers) as $subscriberName) {
-            $definition = DecoratedDefinition::createFromDefinition(
-                $this->container->getDefinition($subscriberName)
-            );
-
+        foreach ($this->getDecoratedDefinitions() as $definition) {
             if ($definition->classInList($classes) === false) {
                 continue;
             }
 
-            $this->container->removeDefinition($subscriberName);
+            $this->container->removeDefinition($definition->getServiceId());
         }
 
         return $this;
     }
+
+    /** @return DecoratedDefinition[] */
+    private function getDecoratedDefinitions(): array
+    {
+        $subscriberNames = array_keys($this->container->findTaggedServiceIds('event_subscriber'));
+
+        return array_map(function(string $subscriberName) {
+            return DecoratedDefinition::createFromDefinition(
+                $this->container->getDefinition($subscriberName)
+            );
+        }, $subscriberNames);
+    }
+
+//    protected function enableModules(array $modules): void
+//    {
+//
+//    }
 }

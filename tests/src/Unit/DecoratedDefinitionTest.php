@@ -10,6 +10,78 @@ use Symfony\Component\DependencyInjection\Definition;
 class DecoratedDefinitionTest extends UnitTestCase
 {
     /** @test */
+    public function has_properties(): void
+    {
+        $definition = $this->createDefinitionWithoutProvider();
+        $definition->getProperties()->willReturn([]);
+
+        $decoratedDefinition = DecoratedDefinition::createFromDefinition(
+            $definition->reveal()
+        );
+
+        $this->assertFalse($decoratedDefinition->hasProperties());
+
+        $definition = $this->createDefinitionWithoutProvider();
+        $definition->getProperties()->willReturn([
+            '_serviceId' => 'my_service.id'
+        ]);
+
+        $decoratedDefinition = DecoratedDefinition::createFromDefinition(
+            $definition->reveal()
+        );
+
+        $this->assertTrue($decoratedDefinition->hasProperties());
+    }
+
+    /** @test */
+    public function has_service_id(): void
+    {
+        $definition = $this->createDefinitionWithoutProvider();
+        $definition->getProperties()->willReturn([]);
+
+        $decoratedDefinition = DecoratedDefinition::createFromDefinition(
+            $definition->reveal()
+        );
+
+        $this->assertFalse($decoratedDefinition->hasServiceid());
+
+        $definition = $this->createDefinitionWithoutProvider();
+        $definition->getProperties()->willReturn([
+            '_serviceId' => 'my_service.id'
+        ]);
+
+        $decoratedDefinition = DecoratedDefinition::createFromDefinition(
+            $definition->reveal()
+        );
+
+        $this->assertTrue($decoratedDefinition->hasServiceid());
+    }
+
+    /** @test */
+    public function get_service_id(): void
+    {
+        $definition = $this->createDefinitionWithoutProvider();
+        $definition->getProperties()->willReturn([]);
+
+        $decoratedDefinition = DecoratedDefinition::createFromDefinition(
+            $definition->reveal()
+        );
+
+        $this->assertNull($decoratedDefinition->getServiceId());
+
+        $definition = $this->createDefinitionWithoutProvider();
+        $definition->getProperties()->willReturn([
+            '_serviceId' => 'my_service.id'
+        ]);
+
+        $decoratedDefinition = DecoratedDefinition::createFromDefinition(
+            $definition->reveal()
+        );
+
+        $this->assertEquals('my_service.id', $decoratedDefinition->getServiceId());
+    }
+
+    /** @test */
     public function has_provider(): void
     {
         $decoratorWithoutProvider = DecoratedDefinition::createFromDefinition(
