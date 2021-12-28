@@ -3,7 +3,7 @@
 namespace Drupal\Tests\test_traits\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
-use Drupal\Tests\test_traits\Kernel\Concerns\InteractsWithMail;
+use Drupal\Tests\test_traits\Kernel\Testing\Concerns\InteractsWithMail;
 
 class InteractsWithMailTest extends KernelTestBase
 {

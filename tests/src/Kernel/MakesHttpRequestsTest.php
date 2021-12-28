@@ -4,7 +4,7 @@ namespace Drupal\Tests\test_traits\Kernel;
 
 use Drupal\Core\Url;
 use Drupal\KernelTests\KernelTestBase;
-use Drupal\Tests\test_traits\Kernel\Concerns\MakesHttpRequests;
+use Drupal\Tests\test_traits\Kernel\Testing\Concerns\MakesHttpRequests;
 
 class MakesHttpRequestsTest extends KernelTestBase
 {

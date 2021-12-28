@@ -2,7 +2,7 @@
 
 namespace Drupal\Tests\test_traits\Unit;
 
-use Drupal\Tests\test_traits\Kernel\Mail\TestMail;
+use Drupal\Tests\test_traits\Kernel\Testing\Mail\TestMail;
 use Drupal\Tests\UnitTestCase;
 use Drupal\user\Entity\User;
 

@@ -1,10 +1,10 @@
 <?php
 
-namespace Drupal\Tests\test_traits\Kernel\Concerns;
+namespace Drupal\Tests\test_traits\Kernel\Testing\Concerns;
 
 use Drupal\Core\Config\FileStorage;
 use Drupal\Core\Site\Settings;
-use Drupal\Tests\test_traits\Kernel\Exceptions\ConfigInstallFailed;
+use Drupal\Tests\test_traits\Kernel\Testing\Exceptions\ConfigInstallFailed;
 
 /** This trait may be used to test fields stored as field configs */
 trait InstallsExportedConfig

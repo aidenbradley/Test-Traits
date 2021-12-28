@@ -1,8 +1,8 @@
 <?php
 
-namespace Drupal\Tests\test_traits\Kernel\Concerns;
+namespace Drupal\Tests\test_traits\Kernel\Testing\Concerns;
 
-use Drupal\Tests\test_traits\Kernel\Mail\TestMail;
+use Drupal\Tests\test_traits\Kernel\Testing\Mail\TestMail;
 
 trait InteractsWithMail
 {

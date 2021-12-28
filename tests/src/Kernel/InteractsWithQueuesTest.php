@@ -9,7 +9,7 @@ use Drupal\Core\Site\Settings;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\node\Entity\Node;
 use Drupal\test_traits_queue\Queue\ReliableCreateNodeQueue;
-use Drupal\Tests\test_traits\Kernel\Concerns\InteractsWithQueues;
+use Drupal\Tests\test_traits\Kernel\Testing\Concerns\InteractsWithQueues;
 
 class InteractsWithQueuesTest extends KernelTestBase
 {
