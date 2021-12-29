@@ -7,11 +7,12 @@ use Symfony\Component\DependencyInjection\Definition;
 class DecoratedDefinition
 {
     /** @var Definition */
-    private $definition;
+    protected $definition;
 
-    public static function createFromDefinition(Definition $definition): self
+    /** @return static */
+    public static function createFromDefinition(Definition $definition)
     {
-        return new self($definition);
+        return new static($definition);
     }
 
     public function __construct(Definition $definition)

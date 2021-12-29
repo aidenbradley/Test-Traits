@@ -2,7 +2,7 @@
 
 namespace Drupal\Tests\test_traits\Kernel\Testing;
 
-use Drupal\Tests\test_traits\Kernel\Testing\Decorators\DecoratedDefinition;
+use Drupal\Tests\test_traits\Kernel\Testing\Decorators\EventSubscriberDefinition;
 
 trait WithoutEvents
 {
@@ -35,7 +35,7 @@ trait WithoutEvents
     {
         $this->withoutEventsFromModules[$module] = $module;
 
-        return $this->removeDefinitions(function(DecoratedDefinition $definition) use ($module) {
+        return $this->removeDefinitions(function(EventSubscriberDefinition $definition) use ($module) {
             return $definition->hasProvider() && $definition->providerIs($module) === false;
         });
     }
@@ -53,7 +53,7 @@ trait WithoutEvents
     {
         $this->withoutEventsFromClasses[$class] = $class;
 
-        return $this->removeDefinitions(function(DecoratedDefinition $definition) use ($class) {
+        return $this->removeDefinitions(function(EventSubscriberDefinition $definition) use ($class) {
             return $definition->isClass($class) === false;
         });
     }
@@ -73,14 +73,8 @@ trait WithoutEvents
         foreach ((array)$eventNames as $eventName) {
             $this->withoutEventsListeningFor[$eventName] = $eventName;
 
-            return $this->removeDefinitions(function(DecoratedDefinition $definition) use ($eventName) {
-                if (method_exists($definition->getClass(), 'getSubscribedEvents') === false) {
-                    return false;
-                }
-
-                $subscribedEvents = $definition->getClass()::getSubscribedEvents();
-
-                return in_array($eventName, array_keys($subscribedEvents)) === false;
+            return $this->removeDefinitions(function(EventSubscriberDefinition $definition) use ($eventName) {
+                return $definition->subscribesTo($eventName) === false;
             });
         }
 
@@ -114,8 +108,8 @@ trait WithoutEvents
         }
     }
 
-    /** @return DecoratedDefinition[] */
-    private function getDecoratedDefinitions(): array
+    /** @return EventSubscriberDefinition[] */
+    private function getEventSubscriberDefinitions(): array
     {
         if (isset($this->decoratedDefinitions)) {
             return $this->decoratedDefinitions;
@@ -124,7 +118,7 @@ trait WithoutEvents
         $subscriberNames = array_keys($this->container->findTaggedServiceIds('event_subscriber'));
 
         $this->decoratedDefinitions = array_map(function (string $subscriberName) {
-            return DecoratedDefinition::createFromDefinition(
+            return EventSubscriberDefinition::createFromDefinition(
                 $this->container->getDefinition($subscriberName)
             );
         }, $subscriberNames);
@@ -134,7 +128,7 @@ trait WithoutEvents
 
     private function removeDefinitions(\Closure $filter = null): self
     {
-        foreach ($this->getDecoratedDefinitions() as $definition) {
+        foreach ($this->getEventSubscriberDefinitions() as $definition) {
             if ($filter !== null && $filter($definition)) {
                 continue;
             }
