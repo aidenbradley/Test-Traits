@@ -8,7 +8,7 @@ trait InteractsWithMail
 {
     public function getSentMail(): array
     {
-        $mail = \Drupal::state()->get('system.test_mail_collector');
+        $mail = $this->container->get('state')->get('system.test_mail_collector');
 
         if ($mail === null) {
             return [];
@@ -82,6 +82,6 @@ trait InteractsWithMail
 
     public function clearMail(): void
     {
-        \Drupal::state()->set('system.test_mail_collector', []);
+        $this->container->get('state')->set('system.test_mail_collector', []);
     }
 }
