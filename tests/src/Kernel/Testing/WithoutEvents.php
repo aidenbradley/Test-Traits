@@ -36,7 +36,7 @@ trait WithoutEvents
         $this->withoutEventsFromModules[$module] = $module;
 
         return $this->removeDefinitions(function(EventSubscriberDefinition $definition) use ($module) {
-            return $definition->hasProvider() && $definition->providerIs($module) === false;
+            return $definition->hasProvider() && $definition->providerIs($module);
         });
     }
 
@@ -54,7 +54,7 @@ trait WithoutEvents
         $this->withoutEventsFromClasses[$class] = $class;
 
         return $this->removeDefinitions(function(EventSubscriberDefinition $definition) use ($class) {
-            return $definition->isClass($class) === false;
+            return $definition->isClass($class);
         });
     }
 
@@ -74,7 +74,7 @@ trait WithoutEvents
             $this->withoutEventsListeningFor[$eventName] = $eventName;
 
             return $this->removeDefinitions(function(EventSubscriberDefinition $definition) use ($eventName) {
-                return $definition->subscribesTo($eventName) === false;
+                return $definition->subscribesTo($eventName);
             });
         }
 
@@ -129,9 +129,11 @@ trait WithoutEvents
     private function removeDefinitions(\Closure $filter = null): self
     {
         foreach ($this->getEventSubscriberDefinitions() as $definition) {
-            if ($filter !== null && $filter($definition)) {
+            if ($filter !== null && $filter($definition) === false) {
                 continue;
             }
+
+            $this->removedDefinitions[$definition->getServiceId()] = $definition;
 
             $this->container->removeDefinition($definition->getServiceId());
         }
