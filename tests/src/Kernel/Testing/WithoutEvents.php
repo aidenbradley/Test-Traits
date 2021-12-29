@@ -7,7 +7,7 @@ use Drupal\Tests\test_traits\Kernel\Testing\Decorators\DecoratedDefinition;
 trait WithoutEvents
 {
     /** @var array */
-    private $decoratedDefinitions = [];
+    private $decoratedDefinitions;
 
     /** @var bool */
     private $ignoreAllEvents = false;
@@ -28,28 +28,16 @@ trait WithoutEvents
     {
         $this->ignoreAllEvents = true;
 
-        $subscribers = $this->container->findTaggedServiceIds('event_subscriber');
-
-        foreach (array_keys($subscribers) as $subscriberName) {
-            $this->container->removeDefinition($subscriberName);
-        }
-
-        return $this;
+        return $this->removeDefinitions();
     }
 
     public function withoutEventsFromModule(string $module): self
     {
         $this->withoutEventsFromModules[$module] = $module;
 
-        foreach ($this->getDecoratedDefinitions() as $definition) {
-            if ($definition->hasProvider() && $definition->providerIs($module) === false) {
-                continue;
-            }
-
-            $this->container->removeDefinition($definition->getServiceId());
-        }
-
-        return $this;
+        return $this->removeDefinitions(function(DecoratedDefinition $definition) use ($module) {
+            return $definition->hasProvider() && $definition->providerIs($module) === false;
+        });
     }
 
     public function withoutEventsFromModules(array $modules): self
@@ -65,15 +53,9 @@ trait WithoutEvents
     {
         $this->withoutEventsFromClasses[$class] = $class;
 
-        foreach ($this->getDecoratedDefinitions() as $definition) {
-            if ($definition->isClass($class) === false) {
-                continue;
-            }
-
-            $this->container->removeDefinition($definition->getServiceId());
-        }
-
-        return $this;
+        return $this->removeDefinitions(function(DecoratedDefinition $definition) use ($class) {
+            return $definition->isClass($class) === false;
+        });
     }
 
     public function withoutEventsFromClasses(array $classes): self
@@ -91,40 +73,18 @@ trait WithoutEvents
         foreach ((array)$eventNames as $eventName) {
             $this->withoutEventsListeningFor[$eventName] = $eventName;
 
-            foreach ($this->getDecoratedDefinitions() as $definition) {
+            return $this->removeDefinitions(function(DecoratedDefinition $definition) use ($eventName) {
                 if (method_exists($definition->getClass(), 'getSubscribedEvents') === false) {
-                    continue;
+                    return false;
                 }
 
                 $subscribedEvents = $definition->getClass()::getSubscribedEvents();
 
-                if (in_array($eventName, array_keys($subscribedEvents)) === false) {
-                    continue;
-                }
-
-                $this->container->removeDefinition($definition->getServiceId());
-            }
+                return in_array($eventName, array_keys($subscribedEvents)) === false;
+            });
         }
 
         return $this;
-    }
-
-    /** @return DecoratedDefinition[] */
-    private function getDecoratedDefinitions(): array
-    {
-        if (isset($this->decoratedDefinitions)) {
-            return $this->decoratedDefinitions;
-        }
-
-        $subscriberNames = array_keys($this->container->findTaggedServiceIds('event_subscriber'));
-
-        $this->decoratedDefinitions = array_map(function (string $subscriberName) {
-            return DecoratedDefinition::createFromDefinition(
-                $this->container->getDefinition($subscriberName)
-            );
-        }, $subscriberNames);
-
-        return $this->decoratedDefinitions;
     }
 
     protected function enableModules(array $modules): void
@@ -152,5 +112,36 @@ trait WithoutEvents
         if (isset($this->withoutEventsListeningFor)) {
             $this->withoutEventsListeningFor($this->withoutEventsListeningFor);
         }
+    }
+
+    /** @return DecoratedDefinition[] */
+    private function getDecoratedDefinitions(): array
+    {
+        if (isset($this->decoratedDefinitions)) {
+            return $this->decoratedDefinitions;
+        }
+
+        $subscriberNames = array_keys($this->container->findTaggedServiceIds('event_subscriber'));
+
+        $this->decoratedDefinitions = array_map(function (string $subscriberName) {
+            return DecoratedDefinition::createFromDefinition(
+                $this->container->getDefinition($subscriberName)
+            );
+        }, $subscriberNames);
+
+        return $this->decoratedDefinitions;
+    }
+
+    private function removeDefinitions(\Closure $filter = null): self
+    {
+        foreach ($this->getDecoratedDefinitions() as $definition) {
+            if ($filter !== null && $filter($definition)) {
+                continue;
+            }
+
+            $this->container->removeDefinition($definition->getServiceId());
+        }
+
+        return $this;
     }
 }
