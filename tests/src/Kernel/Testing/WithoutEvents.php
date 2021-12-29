@@ -24,12 +24,23 @@ trait WithoutEvents
     /** @var array */
     private $removedDefinitions = [];
 
+    /** @var array */
+    private $ignoredListeners = [];
+
     /**
      * Prevents any events from triggering.
+     *
+     * @param string|array $listeners
      */
-    public function withoutEvents(): self
+    public function withoutEvents($listeners = []): self
     {
-        $this->ignoreAllEvents = true;
+        if ($listeners === []) {
+            $this->ignoreAllEvents = true;
+
+            $listeners = $this->getEventSubscriberDefinitions();
+        }
+
+        $this->ignoredListeners = array_merge($this->ignoredListeners, $listeners);
 
         return $this->removeDefinitions();
     }
@@ -38,9 +49,17 @@ trait WithoutEvents
     {
         $this->withoutEventsFromModules[$module] = $module;
 
-        return $this->removeDefinitions(function(EventSubscriberDefinition $definition) use ($module) {
-            return $definition->hasProvider() && $definition->providerIs($module);
-        });
+        foreach ($this->getEventSubscriberDefinitions() as $definition) {
+            if ($definition->hasProvider() && $definition->providerIs($module) === false) {
+                continue;
+            }
+
+            $this->ignoredListeners = array_merge($this->ignoredListeners, [
+                $definition
+            ]);
+        }
+
+        return $this->removeDefinitions();
     }
 
     public function withoutEventsFromModules(array $modules): self
@@ -56,9 +75,17 @@ trait WithoutEvents
     {
         $this->withoutEventsFromClasses[$class] = $class;
 
-        return $this->removeDefinitions(function(EventSubscriberDefinition $definition) use ($class) {
-            return $definition->isClass($class);
-        });
+        foreach ($this->getEventSubscriberDefinitions() as $definition) {
+            if ($definition->isClass($class) === false) {
+                continue;
+            }
+
+            $this->ignoredListeners = array_merge($this->ignoredListeners, [
+                $definition
+            ]);
+        }
+
+        return $this->removeDefinitions();
     }
 
     public function withoutEventsFromClasses(array $classes): self
@@ -73,15 +100,21 @@ trait WithoutEvents
     /** @param string|array $eventNames */
     public function withoutEventsListeningFor($eventNames): self
     {
-        foreach ((array)$eventNames as $eventName) {
-            $this->withoutEventsListeningFor[$eventName] = $eventName;
+        $this->withoutEventsListeningFor = array_merge($this->withoutEventsListeningFor, (array) $eventNames);
 
-            return $this->removeDefinitions(function(EventSubscriberDefinition $definition) use ($eventName) {
-                return $definition->subscribesTo($eventName);
-            });
+        foreach ((array)$eventNames as $eventName) {
+            foreach ($this->getEventSubscriberDefinitions() as $definition) {
+                if ($definition->subscribesTo($eventName) === false) {
+                    continue;
+                }
+
+                $this->ignoredListeners = array_merge($this->ignoredListeners, [
+                    $definition
+                ]);
+            }
         }
 
-        return $this;
+        return $this->removeDefinitions();
     }
 
     protected function enableModules(array $modules): void
@@ -102,11 +135,11 @@ trait WithoutEvents
             $this->withoutEventsFromModule($module);
         }
 
-        if (isset($this->withoutEventsFromClasses)) {
+        if (isset($this->withoutEventsFromClasses) && $this->withoutEventsFromClasses !== []) {
             $this->withoutEventsFromClasses($this->withoutEventsFromClasses);
         }
 
-        if (isset($this->withoutEventsListeningFor)) {
+        if (isset($this->withoutEventsListeningFor) && $this->withoutEventsListeningFor !== []) {
             $this->withoutEventsListeningFor($this->withoutEventsListeningFor);
         }
     }
@@ -131,14 +164,8 @@ trait WithoutEvents
 
     private function removeDefinitions(\Closure $filter = null): self
     {
-        foreach ($this->getEventSubscriberDefinitions() as $definition) {
-            if ($filter !== null && $filter($definition) === false) {
-                continue;
-            }
-
-            $this->removedDefinitions[$definition->getServiceId()] = $definition;
-
-            $this->container->removeDefinition($definition->getServiceId());
+        foreach ($this->ignoredListeners as $listener) {
+            $this->container->removeDefinition($listener->getServiceId());
         }
 
         return $this;
