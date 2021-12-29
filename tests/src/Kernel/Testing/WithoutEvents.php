@@ -21,6 +21,9 @@ trait WithoutEvents
     /** @var array */
     private $withoutEventsListeningFor = [];
 
+    /** @var array */
+    private $removedDefinitions = [];
+
     /**
      * Prevents any events from triggering.
      */
