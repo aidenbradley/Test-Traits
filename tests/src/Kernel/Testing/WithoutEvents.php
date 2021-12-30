@@ -17,17 +17,6 @@ trait WithoutEvents
     private $withoutEventsFromModules = [];
 
     /** @var array */
-    private $withoutEventsFromClasses = [];
-
-    /** @var array */
-    private $withoutEventsListeningFor = [];
-
-    /** @var array */
-    private $removedDefinitions = [];
-
-    /** @var Collection */
-    private $ignoredListeners = [];
-
     private $listenersToIgnore = [];
 
     /**
@@ -61,24 +50,6 @@ trait WithoutEvents
     {
         foreach ($modules as $module) {
             $this->withoutEventsFromModule($module);
-        }
-
-        return $this;
-    }
-
-    public function withoutEventFromClass(string $class): self
-    {
-        $this->listenersToIgnore = array_merge($this->listenersToIgnore, [
-            $class,
-        ]);
-
-        return $this->removeDefinitionsAgain();
-    }
-
-    public function withoutEventsFromClasses(array $classes): self
-    {
-        foreach ($classes as $class) {
-            $this->withoutEventFromClass($class);
         }
 
         return $this;
@@ -123,19 +94,8 @@ trait WithoutEvents
         return $this->decoratedDefinitions;
     }
 
-    private function removeDefinitions(): self
-    {
-        foreach ($this->ignoredListeners as $listener) {
-            $this->container->removeDefinition($listener->getServiceId());
-        }
-
-        return $this;
-    }
-
     private function removeDefinitionsAgain(): self
     {
-        $definitions = $this->getDefinitions();
-
         foreach ($this->listenersToIgnore as $listener) {
             if ($this->container->has($listener)) {
                 $this->container->removeDefinition($listener);
@@ -144,16 +104,16 @@ trait WithoutEvents
             }
 
             if ($this->container->get('module_handler')->moduleExists($listener)) {
-                (clone $definitions)->filter(function (Definition $definition) use ($listener) {
+                $this->getDefinitions()->filter(function (Definition $definition) use ($listener) {
                     return $definition->hasProvider() && $definition->providerIs($listener);
                 })->each(function (Definition $listener) {
-                   $this->container->removeDefinition($listener->getServiceId());
+                    $this->container->removeDefinition($listener->getServiceId());
                 });
 
                 continue;
             }
 
-            (clone $definitions)->filter(function (Definition $definition) use ($listener) {
+            $this->getDefinitions()->filter(function (Definition $definition) use ($listener) {
                 return $definition->isClass($listener) || $definition->subscribesTo($listener);
             })->each(function (Definition $listener) {
                 $this->container->removeDefinition($listener->getServiceId());

@@ -123,7 +123,7 @@ class WithoutEventsTest extends KernelTestBase
             'node',
         ]);
 
-        $this->withoutEventsFromClasses([
+        $this->withoutEvents([
             RouteSubscriber::class, // node.route_subscriber
             ConfigSubscriber::class, // language.config_subscriber
         ]);
@@ -135,7 +135,7 @@ class WithoutEventsTest extends KernelTestBase
     /** @test */
     public function removes_events_by_class_after_enabling_module(): void
     {
-        $this->withoutEventsFromClasses([
+        $this->withoutEvents([
             RouteSubscriber::class, // node.route_subscriber
             ConfigSubscriber::class, // language.config_subscriber
         ]);
