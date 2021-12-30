@@ -14,9 +14,6 @@ trait WithoutEvents
     private $ignoreAllEvents = false;
 
     /** @var array */
-    private $withoutEventsFromModules = [];
-
-    /** @var array */
     private $listenersToIgnore = [];
 
     /**
@@ -32,18 +29,12 @@ trait WithoutEvents
             $listeners = $this->getDefinitions()->map->getServiceId()->toArray();
         }
 
-        $this->listenersToIgnore = array_merge($this->listenersToIgnore, $listeners);
-
-        return $this->removeDefinitionsAgain();
+        return $this->ignore($listeners);
     }
 
     public function withoutEventsFromModule(string $module): self
     {
-        $this->listenersToIgnore = array_merge($this->listenersToIgnore, [
-            $module,
-        ]);
-
-        return $this->removeDefinitionsAgain();
+        return $this->ignore($module);
     }
 
     public function withoutEventsFromModules(array $modules): self
@@ -58,9 +49,15 @@ trait WithoutEvents
     /** @param string|array $eventNames */
     public function withoutEventsListeningFor($eventNames): self
     {
-        $this->listenersToIgnore = array_merge($this->listenersToIgnore, (array)$eventNames);
+        return $this->ignore($eventNames);
+    }
 
-        return $this->removeDefinitionsAgain();
+    /** @param string|array $services */
+    private function ignore($services): self
+    {
+        $this->listenersToIgnore = array_merge($this->listenersToIgnore, (array)$services);
+
+        return $this->removeDefinitions();
     }
 
     protected function enableModules(array $modules): void
@@ -74,10 +71,10 @@ trait WithoutEvents
         }
 
         $ignoreEventsFromModules = collect($modules)->filter(function (string $module) {
-            return isset($this->withoutEventsFromModules[$module]);
+            return in_array($module, $this->listenersToIgnore);
         })->toArray();
 
-        $this->withoutEventsFromModules($ignoreEventsFromModules)->removeDefinitionsAgain();
+        $this->ignore($ignoreEventsFromModules);
     }
 
     /** @return Definition[] */
@@ -94,7 +91,7 @@ trait WithoutEvents
         return $this->decoratedDefinitions;
     }
 
-    private function removeDefinitionsAgain(): self
+    private function removeDefinitions(): self
     {
         foreach ($this->listenersToIgnore as $listener) {
             if ($this->container->has($listener)) {
