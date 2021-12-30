@@ -25,7 +25,7 @@ trait WithoutEvents
     /** @var array */
     private $removedDefinitions = [];
 
-    /** @var array */
+    /** @var Collection */
     private $ignoredListeners = [];
 
     /**
@@ -121,21 +121,13 @@ trait WithoutEvents
             $this->withoutEvents();
         }
 
-        foreach ($modules as $module) {
-            if (isset($this->withoutEventsFromModules[$module]) === false) {
-                continue;
-            }
+        $ignoreEventsFromModules = collect($modules)->filter(function(string $module) {
+            return isset($this->withoutEventsFromModules[$module]);
+        })->toArray();
 
-            $this->withoutEventsFromModule($module);
-        }
-
-        if (isset($this->withoutEventsFromClasses) && $this->withoutEventsFromClasses !== []) {
-            $this->withoutEventsFromClasses($this->withoutEventsFromClasses);
-        }
-
-        if (isset($this->withoutEventsListeningFor) && $this->withoutEventsListeningFor !== []) {
-            $this->withoutEventsListeningFor($this->withoutEventsListeningFor);
-        }
+        $this->withoutEventsFromModules($ignoreEventsFromModules)
+            ->withoutEventsFromClasses($this->withoutEventsFromClasses)
+            ->withoutEventsListeningFor($this->withoutEventsListeningFor);
     }
 
     /** @return Definition[] */
