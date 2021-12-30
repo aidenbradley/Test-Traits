@@ -28,6 +28,8 @@ trait WithoutEvents
     /** @var Collection */
     private $ignoredListeners = [];
 
+    private $listenersToIgnore = [];
+
     /**
      * Prevents any events from triggering.
      *
@@ -41,24 +43,18 @@ trait WithoutEvents
             $listeners = $this->getDefinitions()->map->getServiceId()->toArray();
         }
 
-        foreach ($listeners as $listener) {
-            $this->addListenersToIgnore(function(Definition $definition) use ($listener) {
-                return $definition->getClass() === $listener || $definition->getServiceId() === $listener;
-            });
-        }
+        $this->listenersToIgnore = array_merge($this->listenersToIgnore, $listeners);
 
-        return $this->removeDefinitions();
+        return $this->removeDefinitionsAgain();
     }
 
     public function withoutEventsFromModule(string $module): self
     {
-        $this->withoutEventsFromModules[$module] = $module;
+        $this->listenersToIgnore = array_merge($this->listenersToIgnore, [
+            $module,
+        ]);
 
-        $this->addListenersToIgnore(function(Definition $definition) use ($module) {
-            return $definition->hasProvider() && $definition->providerIs($module);
-        });
-
-        return $this->removeDefinitions();
+        return $this->removeDefinitionsAgain();
     }
 
     public function withoutEventsFromModules(array $modules): self
@@ -72,13 +68,11 @@ trait WithoutEvents
 
     public function withoutEventFromClass(string $class): self
     {
-        $this->withoutEventsFromClasses[$class] = $class;
+        $this->listenersToIgnore = array_merge($this->listenersToIgnore, [
+            $class,
+        ]);
 
-        $this->addListenersToIgnore(function(Definition $definition) use ($class) {
-            return $definition->isClass($class);
-        });
-
-        return $this->removeDefinitions();
+        return $this->removeDefinitionsAgain();
     }
 
     public function withoutEventsFromClasses(array $classes): self
@@ -93,22 +87,9 @@ trait WithoutEvents
     /** @param string|array $eventNames */
     public function withoutEventsListeningFor($eventNames): self
     {
-        $this->withoutEventsListeningFor = array_merge($this->withoutEventsListeningFor, (array) $eventNames);
+        $this->listenersToIgnore = array_merge($this->listenersToIgnore, (array)$eventNames);
 
-        foreach ((array)$eventNames as $eventName) {
-            $this->addListenersToIgnore(function(Definition $definition) use ($eventName) {
-                return $definition->subscribesTo($eventName);
-            });
-        }
-
-        return $this->removeDefinitions();
-    }
-
-    private function addListenersToIgnore(\Closure $filter = null): self
-    {
-        $this->ignoredListeners = $this->getDefinitions()->filter($filter)->merge($this->ignoredListeners);
-
-        return $this;
+        return $this->removeDefinitionsAgain();
     }
 
     protected function enableModules(array $modules): void
@@ -121,13 +102,11 @@ trait WithoutEvents
             $this->withoutEvents();
         }
 
-        $ignoreEventsFromModules = collect($modules)->filter(function(string $module) {
+        $ignoreEventsFromModules = collect($modules)->filter(function (string $module) {
             return isset($this->withoutEventsFromModules[$module]);
         })->toArray();
 
-        $this->withoutEventsFromModules($ignoreEventsFromModules)
-            ->withoutEventsFromClasses($this->withoutEventsFromClasses)
-            ->withoutEventsListeningFor($this->withoutEventsListeningFor);
+        $this->withoutEventsFromModules($ignoreEventsFromModules)->removeDefinitionsAgain();
     }
 
     /** @return Definition[] */
@@ -136,7 +115,7 @@ trait WithoutEvents
         if (isset($this->decoratedDefinitions) === false) {
             $eventSubscribers = $this->container->findTaggedServiceIds('event_subscriber');
 
-            $this->decoratedDefinitions = collect($eventSubscribers)->keys()->map(function(string $serviceId) {
+            $this->decoratedDefinitions = collect($eventSubscribers)->keys()->map(function (string $serviceId) {
                 return $this->container->getDefinition($serviceId);
             })->mapInto(Definition::class);
         }
@@ -148,6 +127,37 @@ trait WithoutEvents
     {
         foreach ($this->ignoredListeners as $listener) {
             $this->container->removeDefinition($listener->getServiceId());
+        }
+
+        return $this;
+    }
+
+    private function removeDefinitionsAgain(): self
+    {
+        $definitions = $this->getDefinitions();
+
+        foreach ($this->listenersToIgnore as $listener) {
+            if ($this->container->has($listener)) {
+                $this->container->removeDefinition($listener);
+
+                continue;
+            }
+
+            if ($this->container->get('module_handler')->moduleExists($listener)) {
+                (clone $definitions)->filter(function (Definition $definition) use ($listener) {
+                    return $definition->hasProvider() && $definition->providerIs($listener);
+                })->each(function (Definition $listener) {
+                   $this->container->removeDefinition($listener->getServiceId());
+                });
+
+                continue;
+            }
+
+            (clone $definitions)->filter(function (Definition $definition) use ($listener) {
+                return $definition->isClass($listener) || $definition->subscribesTo($listener);
+            })->each(function (Definition $listener) {
+                $this->container->removeDefinition($listener->getServiceId());
+            });
         }
 
         return $this;
