@@ -174,4 +174,38 @@ class WithoutEventsTest extends KernelTestBase
 
         $this->assertFalse($this->container->hasDefinition('node.route_subscriber'));
     }
+
+    /** @test */
+    public function without_event_with_class_string_and_service_id(): void
+    {
+        $this->enableModules([
+            'language',
+            'node',
+        ]);
+
+        $this->withoutEvents([
+            RouteSubscriber::class, // node.route_subscriber
+            'language.config_subscriber',
+        ]);
+
+        $this->assertFalse($this->container->hasDefinition('node.route_subscriber'));
+        $this->assertFalse($this->container->hasDefinition('language.config_subscriber'));
+    }
+
+    /** @test */
+    public function removes_event_with_class_string_and_service_id_after_enabling_modules(): void
+    {
+        $this->withoutEvents([
+            RouteSubscriber::class, // node.route_subscriber
+            'language.config_subscriber',
+        ]);
+
+        $this->enableModules([
+            'language',
+            'node',
+        ]);
+
+        $this->assertFalse($this->container->hasDefinition('node.route_subscriber'));
+        $this->assertFalse($this->container->hasDefinition('language.config_subscriber'));
+    }
 }

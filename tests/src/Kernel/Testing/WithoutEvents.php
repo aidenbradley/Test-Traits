@@ -7,14 +7,14 @@ use Illuminate\Support\Collection;
 
 trait WithoutEvents
 {
-    /** @var array */
-    private $decoratedDefinitions;
+    /** @var Definition[] */
+    private $definitions;
 
     /** @var bool */
     private $ignoreAllEvents = false;
 
     /** @var array */
-    private $listenersToIgnore = [];
+    private $ignoredListeners = [];
 
     /**
      * Prevents any events from triggering.
@@ -52,48 +52,50 @@ trait WithoutEvents
         return $this->ignore($eventNames);
     }
 
-    /** @param string|array $services */
-    private function ignore($services): self
-    {
-        $this->listenersToIgnore = array_merge($this->listenersToIgnore, (array)$services);
-
-        return $this->removeDefinitions();
-    }
-
     protected function enableModules(array $modules): void
     {
         parent::enableModules($modules);
 
-        $this->decoratedDefinitions = null;
+        $this->definitions = null;
 
         if ($this->ignoreAllEvents) {
             $this->withoutEvents();
+
+            return;
         }
 
-        $ignoreEventsFromModules = collect($modules)->filter(function (string $module) {
-            return in_array($module, $this->listenersToIgnore);
+        $ignoreModules = collect($modules)->filter(function (string $module) {
+            return in_array($module, $this->ignoredListeners);
         })->toArray();
 
-        $this->ignore($ignoreEventsFromModules);
+        $this->ignore($ignoreModules);
+    }
+
+    /** @param string|array $services */
+    private function ignore($services): self
+    {
+        $this->ignoredListeners = array_merge($this->ignoredListeners, (array)$services);
+
+        return $this->removeDefinitions();
     }
 
     /** @return Definition[] */
     private function getDefinitions(): Collection
     {
-        if (isset($this->decoratedDefinitions) === false) {
+        if (isset($this->definitions) === false) {
             $eventSubscribers = $this->container->findTaggedServiceIds('event_subscriber');
 
-            $this->decoratedDefinitions = collect($eventSubscribers)->keys()->map(function (string $serviceId) {
+            $this->definitions = collect($eventSubscribers)->keys()->map(function (string $serviceId) {
                 return $this->container->getDefinition($serviceId);
             })->mapInto(Definition::class);
         }
 
-        return $this->decoratedDefinitions;
+        return $this->definitions;
     }
 
     private function removeDefinitions(): self
     {
-        foreach ($this->listenersToIgnore as $listener) {
+        foreach ($this->ignoredListeners as $listener) {
             if ($this->container->has($listener)) {
                 $this->container->removeDefinition($listener);
 
