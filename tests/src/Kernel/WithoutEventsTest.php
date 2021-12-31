@@ -156,11 +156,15 @@ class WithoutEventsTest extends KernelTestBase
             'node',
         ]);
 
-        $this->assertTrue($this->container->hasDefinition('node.route_subscriber'));
+        $this->assertNotEmpty(
+            $this->container->get('event_dispatcher')->getListeners(RoutingEvents::ALTER)
+        );
 
         $this->withoutSubscribersForEvents(RoutingEvents::ALTER);
 
-        $this->assertFalse($this->container->hasDefinition('node.route_subscriber'));
+        $this->assertEmpty(
+            $this->container->get('event_dispatcher')->getListeners(RoutingEvents::ALTER)
+        );
     }
 
     /** @test */

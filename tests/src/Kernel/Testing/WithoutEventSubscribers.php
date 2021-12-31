@@ -4,7 +4,6 @@ namespace Drupal\Tests\test_traits\Kernel\Testing;
 
 use Drupal\Tests\test_traits\Kernel\Testing\Collections\EventSubscriberCollection;
 use Drupal\Tests\test_traits\Kernel\Testing\Decorators\EventSubscriberDefinition as Definition;
-use Illuminate\Support\Collection;
 
 trait WithoutEventSubscribers
 {
@@ -79,7 +78,15 @@ trait WithoutEventSubscribers
      */
     public function withoutSubscribersForEvents($eventNames): self
     {
-        return $this->ignore($eventNames);
+        $dispatcher = $this->container->get('event_dispatcher');
+
+        foreach ((array) $eventNames as $event) {
+            foreach ($dispatcher->getListeners($event) as $listener) {
+                $dispatcher->removeSubscriber($listener[0]);
+            }
+        }
+
+        return $this;
     }
 
     protected function enableModules(array $modules): void
