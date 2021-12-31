@@ -5,7 +5,7 @@ namespace Drupal\Tests\test_traits\Kernel\Testing;
 use Drupal\Tests\test_traits\Kernel\Testing\Decorators\EventSubscriberDefinition as Definition;
 use Illuminate\Support\Collection;
 
-trait WithoutEvents
+trait WithoutEventSubscribers
 {
     /** @var Definition[] */
     private $definitions;

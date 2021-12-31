@@ -6,11 +6,11 @@ use Drupal\Core\Routing\RoutingEvents;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\EventSubscriber\ConfigSubscriber;
 use Drupal\node\Routing\RouteSubscriber;
-use Drupal\Tests\test_traits\Kernel\Testing\WithoutEvents;
+use Drupal\Tests\test_traits\Kernel\Testing\WithoutEventSubscribers;
 
 class WithoutEventsTest extends KernelTestBase
 {
-    use WithoutEvents;
+    use WithoutEventSubscribers;
 
     /** @test */
     public function without_events(): void
