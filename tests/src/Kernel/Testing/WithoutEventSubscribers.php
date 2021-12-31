@@ -11,43 +11,35 @@ trait WithoutEventSubscribers
     private $definitions;
 
     /** @var bool */
-    private $ignoreAllEvents = false;
+    private $ignoreAllSubscribers = false;
 
     /** @var array */
-    private $ignoredListeners = [];
+    private $ignoredSubscribers = [];
 
     /**
      * Prevents any events from triggering.
      *
      * @param string|array $listeners
      */
-    public function withoutEvents($listeners = []): self
+    public function withoutSubscribers($subscribers = []): self
     {
-        if ($listeners === []) {
-            $this->ignoreAllEvents = true;
+        if ($subscribers === []) {
+            $this->ignoreAllSubscribers = true;
 
-            $listeners = $this->getDefinitions()->map->getServiceId()->toArray();
+            $subscribers = $this->getDefinitions()->map->getServiceId()->toArray();
         }
 
-        return $this->ignore($listeners);
+        return $this->ignore($subscribers);
     }
 
-    public function withoutEventsFromModule(string $module): self
+    /** @param string|array $modules */
+    public function withoutModuleSubscribers($modules): self
     {
-        return $this->ignore($module);
-    }
-
-    public function withoutEventsFromModules(array $modules): self
-    {
-        foreach ($modules as $module) {
-            $this->withoutEventsFromModule($module);
-        }
-
-        return $this;
+        return $this->ignore($modules);
     }
 
     /** @param string|array $eventNames */
-    public function withoutEventsListeningFor($eventNames): self
+    public function withoutSubscribersForEvents($eventNames): self
     {
         return $this->ignore($eventNames);
     }
@@ -58,14 +50,14 @@ trait WithoutEventSubscribers
 
         $this->definitions = null;
 
-        if ($this->ignoreAllEvents) {
-            $this->withoutEvents();
+        if ($this->ignoreAllSubscribers) {
+            $this->withoutSubscribers();
 
             return;
         }
 
         $ignoreModules = collect($modules)->filter(function (string $module) {
-            return in_array($module, $this->ignoredListeners);
+            return in_array($module, $this->ignoredSubscribers);
         })->toArray();
 
         $this->ignore($ignoreModules);
@@ -74,7 +66,7 @@ trait WithoutEventSubscribers
     /** @param string|array $services */
     private function ignore($services): self
     {
-        $this->ignoredListeners = array_merge($this->ignoredListeners, (array)$services);
+        $this->ignoredSubscribers = array_merge($this->ignoredSubscribers, (array)$services);
 
         return $this->removeDefinitions();
     }
@@ -95,7 +87,7 @@ trait WithoutEventSubscribers
 
     private function removeDefinitions(): self
     {
-        foreach ($this->ignoredListeners as $listener) {
+        foreach ($this->ignoredSubscribers as $listener) {
             if ($this->container->has($listener)) {
                 $this->container->removeDefinition($listener);
 

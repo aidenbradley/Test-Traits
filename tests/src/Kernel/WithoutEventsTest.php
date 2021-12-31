@@ -17,7 +17,7 @@ class WithoutEventsTest extends KernelTestBase
     {
         $this->assertNotEmpty($this->container->findTaggedServiceIds('event_subscriber'));
 
-        $this->withoutEvents();
+        $this->withoutSubscribers();
 
         $this->assertEmpty($this->container->findTaggedServiceIds('event_subscriber'));
     }
@@ -25,7 +25,7 @@ class WithoutEventsTest extends KernelTestBase
     /** @test */
     public function globally_ignores_events_after_enabling_module(): void
     {
-        $this->withoutEvents();
+        $this->withoutSubscribers();
 
         $this->enableModules([
             'language',
@@ -56,7 +56,7 @@ class WithoutEventsTest extends KernelTestBase
             $eventSubscribersBeforeEnable,
         );
 
-        $this->withoutEventsFromModule('language');
+        $this->withoutModuleSubscribers('language');
 
         foreach ($languageEventSubscribers as $languageEventSubscriber) {
             $this->assertFalse($this->container->hasDefinition($languageEventSubscriber));
@@ -101,7 +101,7 @@ class WithoutEventsTest extends KernelTestBase
     /** @test */
     public function removes_events_by_module_after_enabling_module(): void
     {
-        $this->withoutEventsFromModules([
+        $this->withoutModuleSubscribers([
             'language',
             'node',
         ]);
@@ -123,7 +123,7 @@ class WithoutEventsTest extends KernelTestBase
             'node',
         ]);
 
-        $this->withoutEvents([
+        $this->withoutSubscribers([
             RouteSubscriber::class, // node.route_subscriber
             ConfigSubscriber::class, // language.config_subscriber
         ]);
@@ -135,7 +135,7 @@ class WithoutEventsTest extends KernelTestBase
     /** @test */
     public function removes_events_by_class_after_enabling_module(): void
     {
-        $this->withoutEvents([
+        $this->withoutSubscribers([
             RouteSubscriber::class, // node.route_subscriber
             ConfigSubscriber::class, // language.config_subscriber
         ]);
@@ -158,7 +158,7 @@ class WithoutEventsTest extends KernelTestBase
 
         $this->assertTrue($this->container->hasDefinition('node.route_subscriber'));
 
-        $this->withoutEventsListeningFor(RoutingEvents::ALTER);
+        $this->withoutSubscribersForEvents(RoutingEvents::ALTER);
 
         $this->assertFalse($this->container->hasDefinition('node.route_subscriber'));
     }
@@ -166,7 +166,7 @@ class WithoutEventsTest extends KernelTestBase
     /** @test */
     public function remove_events_by_subscribed_event_after_enabling_modules(): void
     {
-        $this->withoutEventsListeningFor(RoutingEvents::ALTER);
+        $this->withoutSubscribersForEvents(RoutingEvents::ALTER);
 
         $this->enableModules([
             'node',
@@ -183,7 +183,7 @@ class WithoutEventsTest extends KernelTestBase
             'node',
         ]);
 
-        $this->withoutEvents([
+        $this->withoutSubscribers([
             RouteSubscriber::class, // node.route_subscriber
             'language.config_subscriber',
         ]);
@@ -195,7 +195,7 @@ class WithoutEventsTest extends KernelTestBase
     /** @test */
     public function removes_event_with_class_string_and_service_id_after_enabling_modules(): void
     {
-        $this->withoutEvents([
+        $this->withoutSubscribers([
             RouteSubscriber::class, // node.route_subscriber
             'language.config_subscriber',
         ]);
