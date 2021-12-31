@@ -66,9 +66,9 @@ class WithoutEventsTest extends KernelTestBase
     /** @test */
     public function without_events_from_modules(): void
     {
-//        $this->markTestIncomplete(
-//            'Need to figure out how to obtain container registrations via service providers that don\'t have a provider set'
-//        );
+        $this->markTestIncomplete(
+            'Need to figure out how to obtain container registrations via service providers that don\'t have a provider set'
+        );
 
         $eventSubscribersBeforeEnable = array_keys(
             $this->container->findTaggedServiceIds('event_subscriber')
