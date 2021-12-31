@@ -88,7 +88,7 @@ class WithoutEventsTest extends KernelTestBase
             $eventSubscribersBeforeEnable,
         );
 
-        $this->withoutEventsFromModules([
+        $this->withoutModuleSubscribers([
             'language',
             'node',
         ]);
