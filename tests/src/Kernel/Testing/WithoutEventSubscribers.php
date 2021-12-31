@@ -17,7 +17,17 @@ trait WithoutEventSubscribers
     private $ignoredSubscribers = [];
 
     /**
-     * Prevents any events from triggering.
+     * Prevents event subscribers from acting when an event is triggered.
+     * Pass one or a list containing either class strings or service IDs.
+     *
+     * @code
+     *     $this->withoutSubscribers('Drupal\node\Routing\RouteSubscriber')
+     *     $this->withoutSubscribers('language.config_subscriber')
+     *     $this->withoutSubscribers([
+     *         'Drupal\node\Routing\RouteSubscriber',
+     *         'language.config_subscriber',
+     *     ]);
+     * @endcode
      *
      * @param string|array $listeners
      */
@@ -32,13 +42,40 @@ trait WithoutEventSubscribers
         return $this->ignore($subscribers);
     }
 
-    /** @param string|array $modules */
+    /**
+     * Define one or a list of modules to prevent their listeners
+     * from acting when an event is triggered
+     *
+     * @code
+     *     $this->withoutModuleSubscribers('node')
+     *     $this->withoutModuleSubscribers([
+     *         'node',
+     *         'language',
+     *     ]);
+     * @endcode
+     *
+     * @param string|array $modules
+     */
     public function withoutModuleSubscribers($modules): self
     {
         return $this->ignore($modules);
     }
 
-    /** @param string|array $eventNames */
+    /**
+     * Define one or a list of event names to prevent listeners
+     * acting when these events are triggered
+     *
+     * @code
+     *     $this->withoutSubscribersForEvents(\Drupal\Core\Routing\RoutingEvents::ALTER)
+     *     $this->withoutSubscribersForEvents('routing.route_finished')
+     *     $this->withoutSubscribersForEvents([
+     *         '\Drupal\Core\Routing\RoutingEvents::ALTER',
+     *         'routing.route_finished',
+     *     ]);
+     * @endcode
+     *
+     * @param string|array $eventNames
+     */
     public function withoutSubscribersForEvents($eventNames): self
     {
         return $this->ignore($eventNames);
