@@ -121,16 +121,21 @@ trait WithoutEventSubscribers
     private function removeDefinitions(): self
     {
         foreach ($this->ignoredSubscribers as $listener) {
-            $this->getDefinitions()
-                ->removeDefinitionsWhere(function (Definition $definition) use ($listener) {
-                    return $definition->getServiceId() === $listener;
-                })
-                ->removeDefinitionsWhere(function (Definition $definition) use ($listener) {
+            $this->getDefinitions()->removeDefinitionsWhere(function (Definition $definition) use ($listener) {
+                return $definition->getServiceId() === $listener;
+            });
+
+            if ($this->container->get('module_handler')->moduleExists($listener)) {
+                $this->getDefinitions()->removeDefinitionsWhere(function (Definition $definition) use ($listener) {
                     return $definition->hasProvider() && $definition->providerIs($listener);
-                })
-                ->removeDefinitionsWhere(function (Definition $definition) use ($listener) {
-                    return $definition->classIs($listener) || $definition->subscribesTo($listener);
                 });
+
+                continue;
+            }
+
+            $this->getDefinitions()->removeDefinitionsWhere(function (Definition $definition) use ($listener) {
+                return $definition->classIs($listener) || $definition->subscribesTo($listener);
+            });
         }
 
         return $this;
