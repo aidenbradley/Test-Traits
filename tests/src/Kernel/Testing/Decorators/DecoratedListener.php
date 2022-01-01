@@ -45,6 +45,11 @@ class DecoratedListener
         return get_class($this->listener);
     }
 
+    public function inList(array $listeners): bool
+    {
+        return in_array($this->getClass(), $listeners) || in_array($this->getServiceId(), $listeners);
+    }
+
     public function getOriginal(): EventSubscriberInterface
     {
         return $this->listener;

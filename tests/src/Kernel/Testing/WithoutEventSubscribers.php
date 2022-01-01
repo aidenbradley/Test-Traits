@@ -2,8 +2,6 @@
 
 namespace Drupal\Tests\test_traits\Kernel\Testing;
 
-use Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher;
-use Drupal\Tests\test_traits\Kernel\Testing\Decorators\DecoratedEventDispatcher as Dispatcher;
 use Drupal\Tests\test_traits\Kernel\Testing\Decorators\DecoratedListener as Listener;
 use Illuminate\Support\Collection;
 
@@ -14,9 +12,6 @@ trait WithoutEventSubscribers
 
     /** @var array */
     private $ignoredEvents;
-
-    /** @var ContainerAwareEventDispatcher */
-    private $dispatcher;
 
     /**
      * Prevents event subscribers from acting when an event is triggered.
@@ -35,10 +30,8 @@ trait WithoutEventSubscribers
      */
     public function withoutSubscribers($listeners = []): self
     {
-        $this->dispatcher()->getListeners()->when($listeners, function (Collection $collection, $listeners) {
-            return $collection->filter(function (Listener $listener) use ($listeners) {
-                return in_array($listener->getClass(), $listeners) || in_array($listener->getServiceId(), $listeners);
-            });
+        $this->getListeners()->when($listeners, function (Collection $collection, $listeners) {
+            return $collection->filter->inList($listeners);
         })->each(function (Listener $listener) {
             $this->removeSubscriber($listener);
         });
@@ -76,11 +69,11 @@ trait WithoutEventSubscribers
      */
     public function withoutSubscribersForEvents($eventNames): self
     {
-        foreach ((array)$eventNames as $event) {
-            $this->dispatcher()->getListeners($event)->each(function (Listener $listener) use ($event) {
+        collect($eventNames)->each(function(string $event) {
+            $this->getListeners($event)->each(function (Listener $listener) use ($event) {
                 $this->removeSubscriber($listener, $event);
             });
-        }
+        });
 
         return $this;
     }
@@ -89,20 +82,27 @@ trait WithoutEventSubscribers
     {
         parent::enableModules($modules);
 
-        if (isset($this->ignoredSubscribers) === false) {
+        if (isset($this->ignoredSubscribers)) {
+            $this->withoutSubscribers(
+                collect($this->ignoredSubscribers)->keys()->toArray()
+            );
+        }
+
+        if (isset($this->ignoredEvents) === false) {
             return;
         }
 
-        $this->withoutSubscribers(
-            collect($this->ignoredSubscribers)->keys()->toArray()
-        );
         $this->withoutSubscribersForEvents(
             collect($this->ignoredEvents)->keys()->toArray()
         );
     }
 
-    private function dispatcher(): Dispatcher
+    private function getListeners(?string $event = null): Collection
     {
-        return Dispatcher::create($this->container->get('event_dispatcher'));
+        $listeners = $this->container->get('event_dispatcher')->getListeners($event);
+
+        return collect($listeners)->unless($event, function(Collection $listeners) {
+            return $listeners->values()->collapse();
+        })->mapInto(Listener::class);
     }
 }
