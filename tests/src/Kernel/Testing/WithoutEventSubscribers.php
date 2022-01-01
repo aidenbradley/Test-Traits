@@ -3,17 +3,11 @@
 namespace Drupal\Tests\test_traits\Kernel\Testing;
 
 use Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher;
-use Drupal\Tests\test_traits\Kernel\Testing\Decorators\EventSubscriberDefinition as Definition;
+use Illuminate\Support\Collection;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 trait WithoutEventSubscribers
 {
-    /** @var Definition[] */
-    private $definitionCollection;
-
-    /** @var bool */
-    private $ignoreAllSubscribers = false;
-
     /** @var array */
     private $ignoredSubscribers;
 
@@ -35,21 +29,18 @@ trait WithoutEventSubscribers
      *
      * @param string|array $listeners
      */
-    public function withoutSubscribers($subscribers = []): self
+    public function withoutSubscribers($listeners = []): self
     {
-        $listeners = collect($this->dispatcher()->getListeners())->values()->collapse();
-
-        if ($subscribers !== []) {
-            $listeners->filter(function (array $subscriber) use ($subscribers) {
-                $listener = $subscriber[0];
-
-                return in_array(get_class($listener), $subscribers) || in_array($listener->_serviceId, $subscribers);
+        collect($this->dispatcher()->getListeners())
+            ->values()
+            ->collapse()
+            ->when($listeners, function(Collection $collection, $listeners) {
+                return $collection->filter(function (array $listener) use ($listeners) {
+                    return in_array(get_class($listener[0]), $listeners) || in_array($listener[0]->_serviceId, $listeners);
+                });
+            })->each(function (array $listener) {
+                $this->removeSubscriber($listener[0]);
             });
-        }
-
-        $listeners->each(function (array $listener) {
-            $this->removeSubscriber($listener[0]);
-        });
 
         return $this;
     }
