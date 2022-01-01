@@ -2,20 +2,16 @@
 
 namespace Drupal\Tests\test_traits\Kernel\Testing;
 
-use Drupal\Tests\test_traits\Kernel\Testing\Collections\EventSubscriberCollection;
-use Drupal\Tests\test_traits\Kernel\Testing\Decorators\EventSubscriberDefinition as Definition;
+use Drupal\Tests\test_traits\Kernel\Testing\Decorators\DecoratedListener as Listener;
 use Illuminate\Support\Collection;
 
 trait WithoutEventSubscribers
 {
-    /** @var Definition[] */
-    private $definitionCollection;
+    /** @var Collection */
+    private $ignoredSubscribers;
 
-    /** @var bool */
-    private $ignoreAllSubscribers = false;
-
-    /** @var array */
-    private $ignoredSubscribers = [];
+    /** @var Collection */
+    private $ignoredEvents;
 
     /**
      * Prevents event subscribers from acting when an event is triggered.
@@ -32,34 +28,26 @@ trait WithoutEventSubscribers
      *
      * @param string|array $listeners
      */
-    public function withoutSubscribers($subscribers = []): self
+    public function withoutSubscribers($listeners = []): self
     {
-        if ($subscribers === []) {
-            $this->ignoreAllSubscribers = true;
+        $this->getListeners()->when($listeners, function (Collection $collection, $listeners) {
+            return $collection->filter->inList($listeners);
+        })->each(function (Listener $listener) {
+            $this->removeSubscriber($listener);
+        });
 
-            $subscribers = $this->getDefinitions()->getServiceIds();
-        }
-
-        return $this->ignore($subscribers);
+        return $this;
     }
 
-    /**
-     * Define one or a list of modules to prevent their listeners
-     * from acting when an event is triggered
-     *
-     * @code
-     *     $this->withoutModuleSubscribers('node')
-     *     $this->withoutModuleSubscribers([
-     *         'node',
-     *         'language',
-     *     ]);
-     * @endcode
-     *
-     * @param string|array $modules
-     */
-    public function withoutModuleSubscribers($modules): self
+    private function removeSubscriber(Listener $listener, ?string $event = null): self
     {
-        return $this->ignore($modules);
+        $this->ignoredEvents = collect($this->ignoredEvents)->when($event, function(Collection $collection, string $event) {
+            return $collection->put($event, $event);
+        });
+        $this->ignoredSubscribers = collect($this->ignoredSubscribers)->put($listener->getServiceId(), $listener);
+        $this->container->get('event_dispatcher')->removeSubscriber($listener->getOriginal());
+
+        return $this;
     }
 
     /**
@@ -79,65 +67,36 @@ trait WithoutEventSubscribers
      */
     public function withoutSubscribersForEvents($eventNames): self
     {
-        return $this->ignore($eventNames);
+        collect($eventNames)->each(function(string $event): void {
+            $this->getListeners($event)->each(function (Listener $listener) use ($event): void {
+                $this->removeSubscriber($listener, $event);
+            });
+        });
+
+        return $this;
     }
 
     protected function enableModules(array $modules): void
     {
         parent::enableModules($modules);
 
-        $this->definitionCollection = null;
+        if (isset($this->ignoredSubscribers)) {
+            $this->withoutSubscribers($this->ignoredSubscribers->keys()->toArray());
+        }
 
-        if ($this->ignoreAllSubscribers) {
-            $this->withoutSubscribers();
-
+        if (isset($this->ignoredEvents) === false) {
             return;
         }
 
-        $ignoreModules = collect($modules)->filter(function (string $module) {
-            return in_array($module, $this->ignoredSubscribers);
-        })->toArray();
-
-        $this->ignore($ignoreModules);
+        $this->withoutSubscribersForEvents($this->ignoredEvents->keys()->toArray());
     }
 
-    /** @param string|array $services */
-    private function ignore($services): self
+    private function getListeners(?string $event = null): Collection
     {
-        $this->ignoredSubscribers = array_merge($this->ignoredSubscribers, (array)$services);
+        $listeners = $this->container->get('event_dispatcher')->getListeners($event);
 
-        return $this->removeDefinitions();
-    }
-
-    private function getDefinitions(): EventSubscriberCollection
-    {
-        if (isset($this->definitionCollection) === false) {
-            $this->definitionCollection = EventSubscriberCollection::create($this->container);
-        }
-
-        return $this->definitionCollection;
-    }
-
-    private function removeDefinitions(): self
-    {
-        foreach ($this->ignoredSubscribers as $listener) {
-            $this->getDefinitions()->removeDefinitionsWhere(function (Definition $definition) use ($listener) {
-                return $definition->getServiceId() === $listener;
-            });
-
-            if ($this->container->get('module_handler')->moduleExists($listener)) {
-                $this->getDefinitions()->removeDefinitionsWhere(function (Definition $definition) use ($listener) {
-                    return $definition->hasProvider() && $definition->providerIs($listener);
-                });
-
-                continue;
-            }
-
-            $this->getDefinitions()->removeDefinitionsWhere(function (Definition $definition) use ($listener) {
-                return $definition->classIs($listener) || $definition->subscribesTo($listener);
-            });
-        }
-
-        return $this;
+        return collect($listeners)->unless($event, function(Collection $listeners) {
+            return $listeners->values()->collapse();
+        })->mapInto(Listener::class);
     }
 }
