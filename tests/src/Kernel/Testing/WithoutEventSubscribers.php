@@ -3,7 +3,6 @@
 namespace Drupal\Tests\test_traits\Kernel\Testing;
 
 use Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher;
-use Drupal\Tests\test_traits\Kernel\Testing\Collections\EventSubscriberCollection;
 use Drupal\Tests\test_traits\Kernel\Testing\Decorators\EventSubscriberDefinition as Definition;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -16,7 +15,7 @@ trait WithoutEventSubscribers
     private $ignoreAllSubscribers = false;
 
     /** @var array */
-    private $ignoredSubscribers = [];
+    private $ignoredSubscribers;
 
     /** @var ContainerAwareEventDispatcher */
     private $dispatcher;
@@ -83,7 +82,7 @@ trait WithoutEventSubscribers
     {
         foreach ((array)$eventNames as $event) {
             foreach ($this->dispatcher()->getListeners($event) as $listener) {
-                $this->dispatcher()->removeSubscriber($listener[0]);
+                $this->removeSubscriber($listener[0]);
             }
         }
 
@@ -93,6 +92,10 @@ trait WithoutEventSubscribers
     protected function enableModules(array $modules): void
     {
         parent::enableModules($modules);
+
+        if (isset($this->ignoredSubscribers) === false) {
+            return;
+        }
 
         $this->withoutSubscribers(array_keys($this->ignoredSubscribers));
     }

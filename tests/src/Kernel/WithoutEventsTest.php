@@ -3,6 +3,7 @@
 namespace Drupal\Tests\test_traits\Kernel;
 
 use Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher;
+use Drupal\Core\Config\ConfigEvents;
 use Drupal\Core\Routing\RoutingEvents;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\EventSubscriber\ConfigSubscriber;
@@ -81,11 +82,11 @@ class WithoutEventsTest extends KernelTestBase
             'node',
         ]);
 
-        $this->assertNotEmpty($this->dispatcher()->getListeners(RoutingEvents::ALTER));
+        $this->assertNotEmpty($this->dispatcher()->getListeners(ConfigEvents::SAVE));
 
-        $this->withoutSubscribersForEvents(RoutingEvents::ALTER);
+        $this->withoutSubscribersForEvents(ConfigEvents::SAVE);
 
-        $this->assertEmpty($this->dispatcher()->getListeners(RoutingEvents::ALTER));
+        $this->assertEmpty($this->dispatcher()->getListeners(ConfigEvents::SAVE));
     }
 
     /** @test */
@@ -141,11 +142,6 @@ class WithoutEventsTest extends KernelTestBase
         }
 
         return $this->dispatcher;
-    }
-
-    private function assertSubscriberListening(string $subscriber): void
-    {
-        $this->assertTrue(in_array($subscriber, $this->container->get('event_dispatcher')->getListeners()));
     }
 
     private function assertSubscriberNotListening(string $subscriber): void
