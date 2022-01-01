@@ -3,8 +3,9 @@
 namespace Drupal\Tests\test_traits\Kernel\Testing;
 
 use Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher;
+use Drupal\Tests\test_traits\Kernel\Testing\Decorators\DecoratedEventDispatcher as Dispatcher;
+use Drupal\Tests\test_traits\Kernel\Testing\Decorators\DecoratedListener as Listener;
 use Illuminate\Support\Collection;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 trait WithoutEventSubscribers
 {
@@ -31,25 +32,22 @@ trait WithoutEventSubscribers
      */
     public function withoutSubscribers($listeners = []): self
     {
-        collect($this->dispatcher()->getListeners())
-            ->values()
-            ->collapse()
-            ->when($listeners, function(Collection $collection, $listeners) {
-                return $collection->filter(function (array $listener) use ($listeners) {
-                    return in_array(get_class($listener[0]), $listeners) || in_array($listener[0]->_serviceId, $listeners);
-                });
-            })->each(function (array $listener) {
-                $this->removeSubscriber($listener[0]);
+        $this->dispatcher()->getListeners()->when($listeners, function(Collection $collection, $listeners) {
+            return $collection->filter(function (Listener $listener) use ($listeners) {
+                return in_array($listener->getClass(), $listeners) || in_array($listener->getServiceId(), $listeners);
             });
+        })->each(function (Listener $listener) {
+            $this->removeSubscriber($listener);
+        });
 
         return $this;
     }
 
-    private function removeSubscriber(EventSubscriberInterface $subscriber): self
+    private function removeSubscriber(Listener $listener): self
     {
-        $this->ignoredSubscribers[$subscriber->_serviceId] = $subscriber;
+        $this->ignoredSubscribers[$listener->getServiceId()] = $listener;
 
-        $this->dispatcher()->removeSubscriber($subscriber);
+        $this->dispatcher()->removeSubscriber($listener->getOriginal());
 
         return $this;
     }
@@ -72,9 +70,9 @@ trait WithoutEventSubscribers
     public function withoutSubscribersForEvents($eventNames): self
     {
         foreach ((array)$eventNames as $event) {
-            foreach ($this->dispatcher()->getListeners($event) as $listener) {
-                $this->removeSubscriber($listener[0]);
-            }
+            $this->dispatcher()->getListeners($event)->each(function(Listener $listener) {
+                $this->removeSubscriber($listener);
+            });
         }
 
         return $this;
@@ -91,10 +89,10 @@ trait WithoutEventSubscribers
         $this->withoutSubscribers(array_keys($this->ignoredSubscribers));
     }
 
-    private function dispatcher(): ContainerAwareEventDispatcher
+    private function dispatcher(): Dispatcher
     {
         if (isset($this->dispatcher) === false) {
-            $this->dispatcher = $this->container->get('event_dispatcher');
+            $this->dispatcher = Dispatcher::create($this->container->get('event_dispatcher'));
         }
 
         return $this->dispatcher;

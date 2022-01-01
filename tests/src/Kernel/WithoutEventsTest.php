@@ -15,16 +15,16 @@ class WithoutEventsTest extends KernelTestBase
     use WithoutEventSubscribers;
 
     /** @var ContainerAwareEventDispatcher */
-    private $dispatcher;
+    private $eventDispatcher;
 
     /** @test */
     public function without_events(): void
     {
-        $this->assertNotEmpty($this->dispatcher()->getListeners());
+        $this->assertNotEmpty($this->eventDispatcher()->getListeners());
 
         $this->withoutSubscribers();
 
-        $this->assertEmpty($this->dispatcher()->getListeners());
+        $this->assertEmpty($this->eventDispatcher()->getListeners());
     }
 
     /** @test */
@@ -82,23 +82,23 @@ class WithoutEventsTest extends KernelTestBase
             'node',
         ]);
 
-        $this->assertNotEmpty($this->dispatcher()->getListeners(ConfigEvents::SAVE));
+        $this->assertNotEmpty($this->eventDispatcher()->getListeners(ConfigEvents::SAVE));
 
         $this->withoutSubscribersForEvents(ConfigEvents::SAVE);
 
-        $this->assertEmpty($this->dispatcher()->getListeners(ConfigEvents::SAVE));
+        $this->assertEmpty($this->eventDispatcher()->getListeners(ConfigEvents::SAVE));
     }
 
     /** @test */
     public function remove_events_by_subscribed_event_after_enabling_modules(): void
     {
-        $this->withoutSubscribersForEvents(RoutingEvents::ALTER);
+        $this->withoutSubscribersForEvents(ConfigEvents::SAVE);
 
         $this->enableModules([
             'node',
         ]);
 
-        $this->assertEmpty($this->dispatcher()->getListeners(RoutingEvents::ALTER));
+        $this->assertEmpty($this->eventDispatcher()->getListeners(ConfigEvents::SAVE));
     }
 
     /** @test */
@@ -135,13 +135,13 @@ class WithoutEventsTest extends KernelTestBase
         $this->assertSubscriberNotListening('language.config_subscriber');
     }
 
-    private function dispatcher(): ContainerAwareEventDispatcher
+    private function eventDispatcher(): ContainerAwareEventDispatcher
     {
-        if (isset($this->dispatcher) === false) {
-            $this->dispatcher = $this->container->get('event_dispatcher');
+        if (isset($this->eventDispatcher) === false) {
+            $this->eventDispatcher = $this->container->get('event_dispatcher');
         }
 
-        return $this->dispatcher;
+        return $this->eventDispatcher;
     }
 
     private function assertSubscriberNotListening(string $subscriber): void
