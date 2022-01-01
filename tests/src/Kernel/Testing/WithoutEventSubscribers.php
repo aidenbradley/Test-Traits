@@ -12,6 +12,9 @@ trait WithoutEventSubscribers
     /** @var array */
     private $ignoredSubscribers;
 
+    /** @var array */
+    private $ignoredEvents;
+
     /** @var ContainerAwareEventDispatcher */
     private $dispatcher;
 
@@ -32,7 +35,7 @@ trait WithoutEventSubscribers
      */
     public function withoutSubscribers($listeners = []): self
     {
-        $this->dispatcher()->getListeners()->when($listeners, function(Collection $collection, $listeners) {
+        $this->dispatcher()->getListeners()->when($listeners, function (Collection $collection, $listeners) {
             return $collection->filter(function (Listener $listener) use ($listeners) {
                 return in_array($listener->getClass(), $listeners) || in_array($listener->getServiceId(), $listeners);
             });
@@ -43,11 +46,15 @@ trait WithoutEventSubscribers
         return $this;
     }
 
-    private function removeSubscriber(Listener $listener): self
+    private function removeSubscriber(Listener $listener, ?string $event = null): self
     {
         $this->ignoredSubscribers[$listener->getServiceId()] = $listener;
 
-        $this->dispatcher()->removeSubscriber($listener->getOriginal());
+        if ($event) {
+            $this->ignoredEvents[$event] = $event;
+        }
+
+        $this->container->get('event_dispatcher')->removeSubscriber($listener->getOriginal());
 
         return $this;
     }
@@ -70,8 +77,8 @@ trait WithoutEventSubscribers
     public function withoutSubscribersForEvents($eventNames): self
     {
         foreach ((array)$eventNames as $event) {
-            $this->dispatcher()->getListeners($event)->each(function(Listener $listener) {
-                $this->removeSubscriber($listener);
+            $this->dispatcher()->getListeners($event)->each(function (Listener $listener) use ($event) {
+                $this->removeSubscriber($listener, $event);
             });
         }
 
@@ -86,15 +93,16 @@ trait WithoutEventSubscribers
             return;
         }
 
-        $this->withoutSubscribers(array_keys($this->ignoredSubscribers));
+        $this->withoutSubscribers(
+            collect($this->ignoredSubscribers)->keys()->toArray()
+        );
+        $this->withoutSubscribersForEvents(
+            collect($this->ignoredEvents)->keys()->toArray()
+        );
     }
 
     private function dispatcher(): Dispatcher
     {
-        if (isset($this->dispatcher) === false) {
-            $this->dispatcher = Dispatcher::create($this->container->get('event_dispatcher'));
-        }
-
-        return $this->dispatcher;
+        return Dispatcher::create($this->container->get('event_dispatcher'));
     }
 }

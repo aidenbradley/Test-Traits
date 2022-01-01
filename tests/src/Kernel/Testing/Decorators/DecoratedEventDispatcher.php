@@ -26,34 +26,4 @@ class DecoratedEventDispatcher
             return $listeners->values()->collapse();
         })->mapInto(DecoratedListener::class);
     }
-
-    /** @return mixed */
-    public function __call(string $name, array $arguments)
-    {
-        if (method_exists($this->dispatcher, $name)) {
-            return $this->dispatcher->$name(...$arguments);
-        }
-
-        return $this;
-    }
-
-    /** @return mixed */
-    public function __get(string $name)
-    {
-        if (property_exists($this->dispatcher, $name)) {
-            return $this->dispatcher->$name;
-        }
-
-        return $this;
-    }
-
-    /** @param mixed $value */
-    public function __set(string $name, $value): self
-    {
-        if (property_exists($this->dispatcher, $name)) {
-            $this->dispatcher->$name = $value;
-        }
-
-        return $this;
-    }
 }

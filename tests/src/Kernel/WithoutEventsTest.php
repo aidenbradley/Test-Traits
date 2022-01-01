@@ -4,7 +4,6 @@ namespace Drupal\Tests\test_traits\Kernel;
 
 use Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher;
 use Drupal\Core\Config\ConfigEvents;
-use Drupal\Core\Routing\RoutingEvents;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\EventSubscriber\ConfigSubscriber;
 use Drupal\node\Routing\RouteSubscriber;
