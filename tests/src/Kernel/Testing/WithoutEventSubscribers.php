@@ -7,10 +7,10 @@ use Illuminate\Support\Collection;
 
 trait WithoutEventSubscribers
 {
-    /** @var array */
+    /** @var Collection */
     private $ignoredSubscribers;
 
-    /** @var array */
+    /** @var Collection */
     private $ignoredEvents;
 
     /**
@@ -41,12 +41,10 @@ trait WithoutEventSubscribers
 
     private function removeSubscriber(Listener $listener, ?string $event = null): self
     {
-        $this->ignoredSubscribers[$listener->getServiceId()] = $listener;
-
-        if ($event) {
-            $this->ignoredEvents[$event] = $event;
-        }
-
+        $this->ignoredEvents = collect($this->ignoredEvents)->when($event, function(Collection $collection, string $event) {
+            return $collection->put($event, $event);
+        });
+        $this->ignoredSubscribers = collect($this->ignoredSubscribers)->put($listener->getServiceId(), $listener);
         $this->container->get('event_dispatcher')->removeSubscriber($listener->getOriginal());
 
         return $this;
@@ -69,8 +67,8 @@ trait WithoutEventSubscribers
      */
     public function withoutSubscribersForEvents($eventNames): self
     {
-        collect($eventNames)->each(function(string $event) {
-            $this->getListeners($event)->each(function (Listener $listener) use ($event) {
+        collect($eventNames)->each(function(string $event): void {
+            $this->getListeners($event)->each(function (Listener $listener) use ($event): void {
                 $this->removeSubscriber($listener, $event);
             });
         });
@@ -83,18 +81,14 @@ trait WithoutEventSubscribers
         parent::enableModules($modules);
 
         if (isset($this->ignoredSubscribers)) {
-            $this->withoutSubscribers(
-                collect($this->ignoredSubscribers)->keys()->toArray()
-            );
+            $this->withoutSubscribers($this->ignoredSubscribers->keys()->toArray());
         }
 
         if (isset($this->ignoredEvents) === false) {
             return;
         }
 
-        $this->withoutSubscribersForEvents(
-            collect($this->ignoredEvents)->keys()->toArray()
-        );
+        $this->withoutSubscribersForEvents($this->ignoredEvents->keys()->toArray());
     }
 
     private function getListeners(?string $event = null): Collection
