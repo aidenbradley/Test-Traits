@@ -17,7 +17,38 @@ class WithoutEventsTest extends KernelTestBase
 
         $this->container->get('event_dispatcher')->dispatch(new Event(), 'test_event');
 
-        $this->assertEventFired('test_event');
-        $this->assertEventFired(Event::class);
+        $this->assertDispatched('test_event');
+        $this->assertDispatched(Event::class);
+    }
+
+    /** @test */
+    public function expects_events(): void
+    {
+        $this->expectsEvents(Event::class);
+
+        $this->container->get('event_dispatcher')->dispatch(new Event(), 'test_event');
+    }
+
+    /** @test */
+    public function doesnt_expect_events(): void
+    {
+        $this->doesntExpectEvents('first_event');
+
+        $this->container->get('event_dispatcher')->dispatch(new Event(), 'second_event');
+    }
+
+    /** @test */
+    public function assert_dispatched_with_callback(): void
+    {
+        $this->withoutEvents();
+
+        $event = new Event();
+        $event->title = 'hello';
+
+        $this->container->get('event_dispatcher')->dispatch($event, 'test_event');
+
+        $this->assertDispatched('test_event', function(Event $firedEvent) use ($event) {
+            return $firedEvent->title === $event->title;
+        });
     }
 }
