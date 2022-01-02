@@ -14,7 +14,7 @@ trait WithoutEventSubscribers
     private $ignoredEvents;
 
     /**
-     * Prevents event subscribers from acting when an event is triggered.
+     * Prevents event subscribers from acting when an event it's listening for is triggered.
      * Pass one or a list containing either class strings or service IDs.
      *
      * @code
@@ -35,17 +35,6 @@ trait WithoutEventSubscribers
         })->each(function (Listener $listener) {
             $this->removeSubscriber($listener);
         });
-
-        return $this;
-    }
-
-    private function removeSubscriber(Listener $listener, ?string $event = null): self
-    {
-        $this->ignoredEvents = collect($this->ignoredEvents)->when($event, function(Collection $collection, string $event) {
-            return $collection->put($event, $event);
-        });
-        $this->ignoredSubscribers = collect($this->ignoredSubscribers)->put($listener->getServiceId(), $listener);
-        $this->container->get('event_dispatcher')->removeSubscriber($listener->getOriginal());
 
         return $this;
     }
@@ -89,6 +78,17 @@ trait WithoutEventSubscribers
         }
 
         $this->withoutSubscribersForEvents($this->ignoredEvents->keys()->toArray());
+    }
+
+    private function removeSubscriber(Listener $listener, ?string $event = null): self
+    {
+        $this->ignoredEvents = collect($this->ignoredEvents)->when($event, function(Collection $collection, string $event) {
+            return $collection->put($event, $event);
+        });
+        $this->ignoredSubscribers = collect($this->ignoredSubscribers)->put($listener->getServiceId(), $listener);
+        $this->container->get('event_dispatcher')->removeSubscriber($listener->getOriginal());
+
+        return $this;
     }
 
     private function getListeners(?string $event = null): Collection

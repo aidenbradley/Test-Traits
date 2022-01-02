@@ -9,7 +9,7 @@ use Drupal\language\EventSubscriber\ConfigSubscriber;
 use Drupal\node\Routing\RouteSubscriber;
 use Drupal\Tests\test_traits\Kernel\Testing\WithoutEventSubscribers;
 
-class WithoutEventsTest extends KernelTestBase
+class WithoutEventSubscribersTest extends KernelTestBase
 {
     use WithoutEventSubscribers;
 
@@ -17,7 +17,7 @@ class WithoutEventsTest extends KernelTestBase
     private $eventDispatcher;
 
     /** @test */
-    public function without_events(): void
+    public function without_event_subscribers(): void
     {
         $this->assertNotEmpty($this->eventDispatcher()->getListeners());
 
@@ -27,7 +27,7 @@ class WithoutEventsTest extends KernelTestBase
     }
 
     /** @test */
-    public function globally_ignores_events_after_enabling_module(): void
+    public function ignores_event_subscribers_after_enabling_module(): void
     {
         $this->withoutSubscribers();
 
@@ -41,7 +41,7 @@ class WithoutEventsTest extends KernelTestBase
     }
 
     /** @test */
-    public function without_events_class_list(): void
+    public function without_event_subscribers_class_list(): void
     {
         $this->enableModules([
             'language',
@@ -58,7 +58,7 @@ class WithoutEventsTest extends KernelTestBase
     }
 
     /** @test */
-    public function removes_events_by_class_after_enabling_module(): void
+    public function ignores_event_subscribers_by_class_after_enabling_module(): void
     {
         $this->withoutSubscribers([
             RouteSubscriber::class, // node.route_subscriber
@@ -75,7 +75,7 @@ class WithoutEventsTest extends KernelTestBase
     }
 
     /** @test */
-    public function without_events_listening_for(): void
+    public function without_event_subscribers_listening_for_events(): void
     {
         $this->enableModules([
             'node',
@@ -89,7 +89,7 @@ class WithoutEventsTest extends KernelTestBase
     }
 
     /** @test */
-    public function remove_events_by_subscribed_event_after_enabling_modules(): void
+    public function ignores_events_by_subscribed_events_after_enabling_modules(): void
     {
         $this->withoutSubscribersForEvents(ConfigEvents::SAVE);
 
@@ -101,7 +101,7 @@ class WithoutEventsTest extends KernelTestBase
     }
 
     /** @test */
-    public function without_event_with_class_string_and_service_id(): void
+    public function without_event_subscribers_by_class_string_or_service_id(): void
     {
         $this->enableModules([
             'language',
@@ -118,7 +118,7 @@ class WithoutEventsTest extends KernelTestBase
     }
 
     /** @test */
-    public function removes_event_with_class_string_and_service_id_after_enabling_modules(): void
+    public function ignores_event_by_class_string_or_service_id_after_enabling_modules(): void
     {
         $this->withoutSubscribers([
             RouteSubscriber::class, // node.route_subscriber
