@@ -3,12 +3,13 @@
 namespace Drupal\Tests\test_traits\Kernel\Testing\Concerns;
 
 use Drupal\Tests\test_traits\Kernel\Testing\Mail\TestMail;
+use Illuminate\Support\Collection;
 
 trait InteractsWithMail
 {
     use HasClosureAssertions;
 
-    public function getSentMail(): array
+    public function getSentMail(?string $fromModule = null): array
     {
         $mail = $this->container->get('state')->get('system.test_mail_collector');
 
@@ -16,9 +17,11 @@ trait InteractsWithMail
             return [];
         }
 
-        return array_map(function(array $mailData) {
-            return TestMail::createFromValues($mailData);
-        }, $mail);
+        return collect($mail)->when($fromModule, function(Collection $mail, string $fromModule) {
+            return $mail->filter(function(array $mail) use($fromModule) {
+                return $mail['module'] === $fromModule;
+            });
+        })->mapInto(TestMail::class)->toArray();
     }
 
     public function assertMailSent(?int $numberOfMailSent = null): self

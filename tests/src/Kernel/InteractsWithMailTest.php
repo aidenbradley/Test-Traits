@@ -44,6 +44,16 @@ class InteractsWithMailTest extends KernelTestBase
     }
 
     /** @test */
+    public function get_sent_mail_from_module(): void
+    {
+        // this will send from the test_traits_mail module
+        $this->sendMail('hello@example.com', 'Hello', 'Hello, at example.com');
+
+        $this->assertNotEmpty($this->getSentMail('test_traits_mail'));
+        $this->assertEmpty($this->getSentMail('node'));
+    }
+
+    /** @test */
     public function get_mail_sent_to(): void
     {
         $this->assertEmpty($this->getMailSentTo('hello@example.com'));
