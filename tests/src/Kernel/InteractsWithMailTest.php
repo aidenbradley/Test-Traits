@@ -106,11 +106,11 @@ class InteractsWithMailTest extends KernelTestBase
     /** @test */
     public function sent_mail_contains_subject(): void
     {
-        $this->assertFalse($this->getMailWithSubject('User Registration'));
+        $this->assertEmpty($this->getMailWithSubject('User Registration'));
 
         $this->sendMail('hello@example.com', 'User Registration', 'Thanks for registering!');
 
-        $this->assertTrue($this->getMailWithSubject('User Registration'));
+        $this->assertNotEmpty($this->getMailWithSubject('User Registration'));
     }
 
     /** @test */
