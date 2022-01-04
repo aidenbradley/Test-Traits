@@ -3,10 +3,13 @@
 namespace Drupal\Tests\test_traits\Kernel\Testing\Concerns;
 
 use Drupal\Tests\test_traits\Kernel\Testing\Mail\TestMail;
+use Illuminate\Support\Collection;
 
 trait InteractsWithMail
 {
-    public function getSentMail(): array
+    use HasClosureAssertions;
+
+    public function getSentMail(?string $fromModule = null): array
     {
         $mail = $this->container->get('state')->get('system.test_mail_collector');
 
@@ -14,42 +17,62 @@ trait InteractsWithMail
             return [];
         }
 
-        return array_map(function(array $mailData) {
-            return TestMail::createFromValues($mailData);
-        }, $mail);
+        return collect($mail)->when($fromModule, function(Collection $mail, string $fromModule) {
+            return $mail->filter(function(array $mail) use($fromModule) {
+                return $mail['module'] === $fromModule;
+            });
+        })->mapInto(TestMail::class)->toArray();
     }
 
-    public function countMailSent(): int
+    public function assertMailSent(?int $numberOfMailSent = null): self
     {
-        return count($this->getSentMail());
+        $mail = $this->getSentMail();
+
+        $this->assertNotEmpty($mail);
+
+        if ($numberOfMailSent) {
+            $this->assertEquals($numberOfMailSent, count($mail));
+        }
+
+        return $this;
     }
 
-    public function getMailSentTo(string $mailTo): array
+    public function assertNoMailSent(): self
     {
-        $sentMail = [];
+        $this->assertEmpty($this->getSentMail());
 
+        return $this;
+    }
+
+    public function getMailSentTo(string $mailTo): ?TestMail
+    {
         /** @var TestMail $mail */
         foreach ($this->getSentMail() as $mail) {
             if ($mail->getTo() !== $mailTo) {
                 continue;
             }
 
-            $sentMail[] = $mail;
+            return $mail;
         }
 
-        return $sentMail;
+        return null;
     }
 
-    public function sentMailContainsToAddress(string $mailTo): bool
+    public function assertMailSentTo(string $to, ?\Closure $callback = null): self
     {
-        /** @var TestMail $mail */
-        foreach ($this->getSentMail() as $mail) {
-            if ($mail->getTo() === $mailTo) {
-                return true;
-            }
+        $mail = $this->getMailSentTo($to);
+
+        if ($mail === null) {
+            $this->fail('No email was sent to ' . $to);
         }
 
-        return false;
+        $this->assertEquals($to, $mail->getTo());
+
+        if ($callback) {
+            $this->addClosureAssertion($callback, $mail);
+        }
+
+        return $this;
     }
 
     public function getMailWithSubject(string $subject): array
@@ -68,16 +91,26 @@ trait InteractsWithMail
         return $sentMail;
     }
 
-    public function sentMailContainsSubject(string $subject): bool
+    /** The closure is passed to each mail item found with the given subject */
+    public function assertMailSentWithSubject(string $subject, ?callable $callback = null): self
     {
-        /** @var TestMail $mail */
-        foreach ($this->getSentMail() as $mail) {
-            if ($mail->getSubject() === $subject) {
-                return true;
-            }
+        $mailItems = $this->getMailWithSubject($subject);
+
+        if ($mailItems === []) {
+            $this->fail('No email was sent with subject ' . $subject);
         }
 
-        return false;
+        foreach ($mailItems as $mail) {
+            $this->assertEquals($subject, $mail->getSubject());
+
+            if ($callback === null) {
+                continue;
+            }
+
+            $this->addClosureAssertion($callback, $mail);
+        }
+
+        return $this;
     }
 
     public function clearMail(): void

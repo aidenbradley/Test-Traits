@@ -54,7 +54,11 @@ class TestMailTest extends UnitTestCase
         $mail = TestMail::createFromValues([
             'body' => 'email body',
         ]);
+        $this->assertEquals('email body', $mail->getBody());
 
+        $mail = TestMail::createFromValues([
+            'body' => 'email body' . PHP_EOL,
+        ]);
         $this->assertEquals('email body', $mail->getBody());
     }
 
