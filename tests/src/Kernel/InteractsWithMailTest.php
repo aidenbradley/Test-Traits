@@ -77,7 +77,7 @@ class InteractsWithMailTest extends KernelTestBase
 
         $this->assertNotEmpty($this->getMailWithSubject('User Registration'));
 
-        $this->assertMailWithSubject('User Registration', function(TestMail $mail) {
+        $this->assertMailSentWithSubject('User Registration', function(TestMail $mail) {
             $mail->assertSentTo('hello@example.com');
         });
     }
@@ -92,7 +92,7 @@ class InteractsWithMailTest extends KernelTestBase
 
         $this->assertNotEmpty($this->getMailWithSubject('User Registration'));
 
-        $this->assertMailWithSubject('User Registration', function(TestMail $mail) {
+        $this->assertMailSentWithSubject('User Registration', function(TestMail $mail) {
             if ($mail->getTo() === 'hello@example.com') {
                 $mail->assertBody('Thanks for registering!');
             }
@@ -106,11 +106,11 @@ class InteractsWithMailTest extends KernelTestBase
     /** @test */
     public function sent_mail_contains_subject(): void
     {
-        $this->assertFalse($this->sentMailContainsSubject('User Registration'));
+        $this->assertFalse($this->getMailWithSubject('User Registration'));
 
         $this->sendMail('hello@example.com', 'User Registration', 'Thanks for registering!');
 
-        $this->assertTrue($this->sentMailContainsSubject('User Registration'));
+        $this->assertTrue($this->getMailWithSubject('User Registration'));
     }
 
     /** @test */

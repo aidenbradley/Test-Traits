@@ -91,7 +91,8 @@ trait InteractsWithMail
         return $sentMail;
     }
 
-    public function assertMailWithSubject(string $subject, ?callable $callback = null): self
+    /** The closure is passed to each mail item found with the given subject */
+    public function assertMailSentWithSubject(string $subject, ?callable $callback = null): self
     {
         $mailItems = $this->getMailWithSubject($subject);
 
@@ -110,18 +111,6 @@ trait InteractsWithMail
         }
 
         return $this;
-    }
-
-    public function sentMailContainsSubject(string $subject): bool
-    {
-        /** @var TestMail $mail */
-        foreach ($this->getSentMail() as $mail) {
-            if ($mail->getSubject() === $subject) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     public function clearMail(): void
