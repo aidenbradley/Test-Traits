@@ -6,6 +6,8 @@ use Drupal\Tests\test_traits\Kernel\Testing\Mail\TestMail;
 
 trait InteractsWithMail
 {
+    use HasClosureAssertions;
+
     public function getSentMail(): array
     {
         $mail = $this->container->get('state')->get('system.test_mail_collector');
@@ -19,14 +21,22 @@ trait InteractsWithMail
         }, $mail);
     }
 
-    public function countMailSent(): int
+    public function assertMailSent(?int $numberOfMailSent = null): self
     {
-        return count($this->getSentMail());
+        $mail = $this->getSentMail();
+
+        $this->assertNotEmpty($mail);
+
+        if ($numberOfMailSent) {
+            $this->assertEquals($numberOfMailSent, count($mail));
+        }
+
+        return $this;
     }
 
-    public function assertMailSentCount(int $count): self
+    public function assertNoMailSent(): self
     {
-        $this->assertEquals($count, $this->countMailSent());
+        $this->assertEmpty($this->getSentMail());
 
         return $this;
     }
@@ -45,9 +55,9 @@ trait InteractsWithMail
         return null;
     }
 
-    public function assertMailSentTo(string $to, ?callable $callback = null): self
+    public function assertMailSentTo(string $to, ?\Closure $callback = null): self
     {
-        $mail = $this->getMailSentTo($to)->getTo();
+        $mail = $this->getMailSentTo($to);
 
         if ($mail === null) {
             $this->fail('No email was sent to ' . $to);
@@ -56,22 +66,10 @@ trait InteractsWithMail
         $this->assertEquals($to, $mail->getTo());
 
         if ($callback) {
-            $callback($mail);
+            $this->addClosureAssertion($callback, $mail);
         }
 
         return $this;
-    }
-
-    public function sentMailContainsToAddress(string $mailTo): bool
-    {
-        /** @var TestMail $mail */
-        foreach ($this->getSentMail() as $mail) {
-            if ($mail->getTo() === $mailTo) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     public function getMailWithSubject(string $subject): array
@@ -88,6 +86,27 @@ trait InteractsWithMail
         }
 
         return $sentMail;
+    }
+
+    public function assertMailWithSubject(string $subject, ?callable $callback = null): self
+    {
+        $mailItems = $this->getMailWithSubject($subject);
+
+        if ($mailItems === []) {
+            $this->fail('No email was sent with subject ' . $subject);
+        }
+
+        foreach ($mailItems as $mail) {
+            $this->assertEquals($subject, $mail->getSubject());
+
+            if ($callback === null) {
+                continue;
+            }
+
+            $this->addClosureAssertion($callback, $mail);
+        }
+
+        return $this;
     }
 
     public function sentMailContainsSubject(string $subject): bool
