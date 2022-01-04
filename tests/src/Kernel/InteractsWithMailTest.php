@@ -4,6 +4,8 @@ namespace Drupal\Tests\test_traits\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\test_traits\Kernel\Testing\Concerns\InteractsWithMail;
+use Drupal\Tests\test_traits\Kernel\Testing\Mail\TestMail;
+use PHPUnit\Framework\Assert;
 
 class InteractsWithMailTest extends KernelTestBase
 {
@@ -30,21 +32,25 @@ class InteractsWithMailTest extends KernelTestBase
     /** @test */
     public function get_sent_mail(): void
     {
-        $this->assertEmpty($this->getSentMail());
+        $this->assertNoMailSent();
 
         $this->sendMail('hello@example.com', 'Hello', 'Hello, at example.com');
 
-        $this->assertNotEmpty($this->getSentMail());
+        $this->assertMailSent(1);
+
+        $this->sendMail('hello@example.com', 'Hello', 'Hello, at example.com');
+
+        $this->assertMailSent(2);
     }
 
     /** @test */
-    public function count_mail_sent(): void
+    public function get_sent_mail_from_module(): void
     {
-        $this->assertEquals(0, $this->countMailSent());
-
+        // this will send from the test_traits_mail module
         $this->sendMail('hello@example.com', 'Hello', 'Hello, at example.com');
 
-        $this->assertEquals(1, $this->countMailSent());
+        $this->assertNotEmpty($this->getSentMail('test_traits_mail'));
+        $this->assertEmpty($this->getSentMail('node'));
     }
 
     /** @test */
@@ -55,20 +61,11 @@ class InteractsWithMailTest extends KernelTestBase
         $this->sendMail('hello@example.com', 'Hello', 'Hello, at example.com');
 
         $this->assertNotEmpty($this->getMailSentTo('hello@example.com'));
-    }
 
-    /** @test */
-    public function sent_mail_contains_to_address(): void
-    {
-        $this->assertFalse(
-            $this->sentMailContainsToAddress('hello@example.com')
-        );
-
-        $this->sendMail('hello@example.com', 'Hello', 'Hello, at example.com');
-
-        $this->assertTrue(
-            $this->sentMailContainsToAddress('hello@example.com')
-        );
+        $this->assertMailSentTo('hello@example.com', function(TestMail $mail) {
+            $mail->assertSentTo('hello@example.com');
+            $mail->assertSubject('Hello');
+        });
     }
 
     /** @test */
@@ -79,30 +76,55 @@ class InteractsWithMailTest extends KernelTestBase
         $this->sendMail('hello@example.com', 'User Registration', 'Thanks for registering!');
 
         $this->assertNotEmpty($this->getMailWithSubject('User Registration'));
+
+        $this->assertMailSentWithSubject('User Registration', function(TestMail $mail) {
+            $mail->assertSentTo('hello@example.com');
+        });
+    }
+
+    /** @test */
+    public function multiple_get_mail_with_subject(): void
+    {
+        $this->assertEmpty($this->getMailWithSubject('User Registration'));
+
+        $this->sendMail('hello@example.com', 'User Registration', 'Thanks for registering!');
+        $this->sendMail('hello_again@example.com', 'User Registration', 'Thanks for registering again!');
+
+        $this->assertNotEmpty($this->getMailWithSubject('User Registration'));
+
+        $this->assertMailSentWithSubject('User Registration', function(TestMail $mail) {
+            if ($mail->getTo() === 'hello@example.com') {
+                $mail->assertBody('Thanks for registering!');
+            }
+
+            if ($mail->getTo() === 'hello_again@example.com') {
+                $mail->assertBody('Thanks for registering again!');
+            }
+        });
     }
 
     /** @test */
     public function sent_mail_contains_subject(): void
     {
-        $this->assertFalse($this->sentMailContainsSubject('User Registration'));
+        $this->assertEmpty($this->getMailWithSubject('User Registration'));
 
         $this->sendMail('hello@example.com', 'User Registration', 'Thanks for registering!');
 
-        $this->assertTrue($this->sentMailContainsSubject('User Registration'));
+        $this->assertNotEmpty($this->getMailWithSubject('User Registration'));
     }
 
     /** @test */
     public function clear_mail(): void
     {
-        $this->assertEmpty($this->getSentMail());
+        $this->assertNoMailSent();
 
         $this->sendMail('hello@example.com', 'Hello', 'Hello, at example.com');
 
-        $this->assertNotEmpty($this->getSentMail());
+        $this->assertMailSent();
 
         $this->clearMail();
 
-        $this->assertEmpty($this->getSentMail());
+        $this->assertNoMailSent();
     }
 
     private function sendMail(string $to, string $subject, string $body, array $params = []): void

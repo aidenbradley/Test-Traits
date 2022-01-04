@@ -45,7 +45,7 @@ class TestMail
 
     public function getBody(): ?string
     {
-        return $this->getValue('body');
+        return preg_replace('/\s+/', ' ', trim($this->getValue('body')));
     }
 
     /** @param mixed body */
