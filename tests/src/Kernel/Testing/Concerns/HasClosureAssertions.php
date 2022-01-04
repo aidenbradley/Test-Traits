@@ -6,6 +6,10 @@ trait HasClosureAssertions
 {
     private $callbackAssertions;
 
+    /**
+     * This is to get around the serialization issue with PHPUnit and closures
+     * For now, closure assertions are deferred to the teardown of the test
+     */
     protected function addClosureAssertion(\Closure $closure, $args = null): self
     {
         $this->callbackAssertions[] = [
