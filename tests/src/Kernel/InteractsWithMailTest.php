@@ -4,6 +4,7 @@ namespace Drupal\Tests\test_traits\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\test_traits\Kernel\Testing\Concerns\InteractsWithMail;
+use Drupal\Tests\test_traits\Kernel\Testing\Mail\TestMail;
 
 class InteractsWithMailTest extends KernelTestBase
 {
@@ -45,6 +46,8 @@ class InteractsWithMailTest extends KernelTestBase
         $this->sendMail('hello@example.com', 'Hello', 'Hello, at example.com');
 
         $this->assertEquals(1, $this->countMailSent());
+
+        $this->assertMailSentCount(1);
     }
 
     /** @test */
@@ -55,6 +58,10 @@ class InteractsWithMailTest extends KernelTestBase
         $this->sendMail('hello@example.com', 'Hello', 'Hello, at example.com');
 
         $this->assertNotEmpty($this->getMailSentTo('hello@example.com'));
+
+        $this->assertMailSentTo('hello@example.com', function(TestMail $mail) {
+            $this->assertEquals('Hello, at example.com', $mail->getBody());
+        });
     }
 
     /** @test */

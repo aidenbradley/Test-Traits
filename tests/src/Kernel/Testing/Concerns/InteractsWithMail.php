@@ -24,20 +24,42 @@ trait InteractsWithMail
         return count($this->getSentMail());
     }
 
-    public function getMailSentTo(string $mailTo): array
+    public function assertMailSentCount(int $count): self
     {
-        $sentMail = [];
+        $this->assertEquals($count, $this->countMailSent());
 
+        return $this;
+    }
+
+    public function getMailSentTo(string $mailTo): ?TestMail
+    {
         /** @var TestMail $mail */
         foreach ($this->getSentMail() as $mail) {
             if ($mail->getTo() !== $mailTo) {
                 continue;
             }
 
-            $sentMail[] = $mail;
+            return $mail;
         }
 
-        return $sentMail;
+        return null;
+    }
+
+    public function assertMailSentTo(string $to, ?callable $callback = null): self
+    {
+        $mail = $this->getMailSentTo($to)->getTo();
+
+        if ($mail === null) {
+            $this->fail('No email was sent to ' . $to);
+        }
+
+        $this->assertEquals($to, $mail->getTo());
+
+        if ($callback) {
+            $callback($mail);
+        }
+
+        return $this;
     }
 
     public function sentMailContainsToAddress(string $mailTo): bool
