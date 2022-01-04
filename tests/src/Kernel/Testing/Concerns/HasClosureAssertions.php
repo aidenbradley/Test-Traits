@@ -18,10 +18,12 @@ trait HasClosureAssertions
 
     protected function teardown(): void
     {
-        foreach ($this->callbackAssertions as $assertionCallbacks) {
-            $assertionCallbacks['closure'](
-                $assertionCallbacks['args']
-            );
+        if (isset($this->callbackAssertions)) {
+            foreach ($this->callbackAssertions as $assertionCallbacks) {
+                $assertionCallbacks['closure'](
+                    $assertionCallbacks['args']
+                );
+            }
         }
 
         parent::teardown();
