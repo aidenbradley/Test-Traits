@@ -40,7 +40,7 @@ class WithoutEventsTest extends KernelTestBase
     /** @test */
     public function assert_dispatched_with_callback(): void
     {
-        $this->withoutEvents();
+        $this->expectsEvents('test_event');
 
         $event = new Event();
         $event->title = 'hello';
@@ -48,6 +48,10 @@ class WithoutEventsTest extends KernelTestBase
         $this->container->get('event_dispatcher')->dispatch($event, 'test_event');
 
         $this->assertDispatched('test_event', function(Event $firedEvent) use ($event) {
+            return $firedEvent->title === $event->title;
+        });
+
+        $this->assertDispatched(Event::class, function(Event $firedEvent) use ($event) {
             return $firedEvent->title === $event->title;
         });
     }
