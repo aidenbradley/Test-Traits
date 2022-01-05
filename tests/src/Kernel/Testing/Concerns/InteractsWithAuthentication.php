@@ -20,9 +20,9 @@ trait InteractsWithAuthentication
 
     public function actingAsAnonymous(): self
     {
-        $userStorage = $this->container->get('entity_type.manager')->getStorage('user');
-
         if (isset($this->anonymousUser) === false) {
+            $userStorage = $this->container->get('entity_type.manager')->getStorage('user');
+
             $userStorage->create([
                 'uid' => 0,
                 'name' => 'anonymous',
