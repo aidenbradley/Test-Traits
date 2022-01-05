@@ -7,8 +7,6 @@ use Illuminate\Support\Collection;
 
 trait InteractsWithMail
 {
-    use HasClosureAssertions;
-
     public function getSentMail(?string $fromModule = null): array
     {
         $mail = $this->container->get('state')->get('system.test_mail_collector');
@@ -69,7 +67,7 @@ trait InteractsWithMail
         $this->assertEquals($to, $mail->getTo());
 
         if ($callback) {
-            $this->addClosureAssertion($callback, $mail);
+            $callback($mail);
         }
 
         return $this;
@@ -92,7 +90,7 @@ trait InteractsWithMail
     }
 
     /** The closure is passed to each mail item found with the given subject */
-    public function assertMailSentWithSubject(string $subject, ?callable $callback = null): self
+    public function assertMailSentWithSubject(string $subject, ?\Closure $callback = null): self
     {
         $mailItems = $this->getMailWithSubject($subject);
 
@@ -107,7 +105,7 @@ trait InteractsWithMail
                 continue;
             }
 
-            $this->addClosureAssertion($callback, $mail);
+            $callback($mail);
         }
 
         return $this;

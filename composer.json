@@ -1,5 +1,6 @@
 {
-    "require": {
-        "illuminate/collections": "^8.77"
+    "require-dev": {
+        "illuminate/collections": "^8.77",
+        "opis/closure": "^3.6"
     }
 }
