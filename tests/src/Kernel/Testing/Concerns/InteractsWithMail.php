@@ -111,8 +111,10 @@ trait InteractsWithMail
         return $this;
     }
 
-    public function clearMail(): void
+    public function clearMail(): self
     {
         $this->container->get('state')->set('system.test_mail_collector', []);
+
+        return $this;
     }
 }
