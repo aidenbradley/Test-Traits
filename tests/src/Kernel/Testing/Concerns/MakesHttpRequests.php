@@ -20,11 +20,6 @@ trait MakesHttpRequests
     /** @var null|bool */
     private $requestIsAjax = null;
 
-    public static function responseClass(): string
-    {
-        return TestResponse::class;
-    }
-
     public function get(string $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null): TestResponse
     {
         return $this->call('GET', ...func_get_args());
@@ -139,7 +134,7 @@ trait MakesHttpRequests
         $kernel->invalidateContainer();
         $kernel->rebuildContainer();
 
-        return static::responseClass()::fromBaseResponse($response);
+        return TestResponse::fromBaseResponse($response);
     }
 
     public function followingRedirects()
