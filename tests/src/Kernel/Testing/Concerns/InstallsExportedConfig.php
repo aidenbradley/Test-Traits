@@ -15,7 +15,7 @@ trait InstallsExportedConfig
     /** @var bool */
     protected $installFieldModule;
 
-    public function installField(string $fieldName, string $entityType, ?string $bundle = null): void
+    public function installField(string $fieldName, string $entityType, ?string $bundle = null): self
     {
         if (isset($this->installFieldModule) === false) {
             $this->enableModules(['field']);
@@ -23,92 +23,102 @@ trait InstallsExportedConfig
             $this->installFieldModule = true;
         }
 
-        $this->installExportedConfig([
+        return $this->installExportedConfig([
             'field.storage.' . $entityType . '.' . $fieldName,
             'field.field.' . $entityType . '.' . ($bundle ? $bundle . '.' : $entityType . '.') . $fieldName,
         ]);
     }
 
-    public function installFields(array $fieldNames, string $entityType, ?string $bundle = null): void
+    public function installFields(array $fieldNames, string $entityType, ?string $bundle = null): self
     {
         foreach ($fieldNames as $fieldName) {
             $this->installField($fieldName, $entityType, $bundle);
         }
+
+        return $this;
     }
 
-    public function installImageStyle(string $imageStyle): void
+    public function installImageStyle(string $imageStyle): self
     {
-        $this->installExportedConfig([
+        return $this->installExportedConfig([
             'image.style.' . $imageStyle,
         ]);
     }
 
-    public function installImageStyles(array $imageStyles): void
+    public function installImageStyles(array $imageStyles): self
     {
         foreach ($imageStyles as $imageStyle) {
             $this->installImageStyle($imageStyle);
         }
+
+        return $this;
     }
 
-    public function installBundle(string $module, string $bundle): void
+    public function installBundle(string $module, string $bundle): self
     {
-        $this->installExportedConfig([
+        return $this->installExportedConfig([
             $module . '.type.' . $bundle,
         ]);
     }
 
-    public function installBundles(string $entityType, array $bundles): void
+    public function installBundles(string $entityType, array $bundles): self
     {
         foreach ($bundles as $bundle) {
             $this->installBundle($entityType, $bundle);
         }
+
+        return $this;
     }
 
     /** @param string|array $bundles */
-    public function installEntitySchemaWithBundles(string $entityType, $bundles): void
+    public function installEntitySchemaWithBundles(string $entityType, $bundles): self
     {
         $this->installEntitySchema($entityType);
 
-        $this->installBundles($entityType, (array)$bundles);
+        return $this->installBundles($entityType, (array)$bundles);
     }
 
-    public function installRole(string $role): void
+    public function installRole(string $role): self
     {
-        $this->installExportedConfig('user.role.' . $role);
+        return $this->installExportedConfig('user.role.' . $role);
     }
 
-    public function installRoles(array $roles): void
+    public function installRoles(array $roles): self
     {
         foreach ($roles as $role) {
             $this->installRole($role);
         }
+
+        return $this;
     }
 
-    public function installVocabulary(string $vocabularyName): void
+    public function installVocabulary(string $vocabularyName): self
     {
-        $this->installExportedConfig([
+        return $this->installExportedConfig([
             'taxonomy.vocabulary.' . $vocabularyName,
         ]);
     }
 
-    public function installVocabularies(array $vocabularies): void
+    public function installVocabularies(array $vocabularies): self
     {
         foreach ($vocabularies as $vocabulary) {
             $this->installVocabulary($vocabulary);
         }
+
+        return $this;
     }
 
-    public function installAllFieldsForEntity(string $entityType, ?string $bundle = null): void
+    public function installAllFieldsForEntity(string $entityType, ?string $bundle = null): self
     {
         $configStorage = new FileStorage($this->configDirectory());
 
-        $this->installFields(array_map(function ($storageFieldName) {
+        return $this->installFields(array_map(function ($storageFieldName) {
             return substr($storageFieldName, strripos($storageFieldName, '.') + 1);
         }, $configStorage->listAll('field.storage.' . $entityType)), $entityType, $bundle);
     }
 
     /** @param string|array $config */
-    public function installExportedConfig($config): void
+    public function installExportedConfig($config): self
     {
         $configStorage = new FileStorage($this->configDirectory());
 
@@ -132,6 +142,8 @@ trait InstallsExportedConfig
 
             $storage->createFromStorageRecord($configRecord)->save();
         }
+
+        return $this;
     }
 
     protected function configDirectory(): string

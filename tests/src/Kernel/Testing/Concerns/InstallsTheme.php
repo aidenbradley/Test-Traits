@@ -2,13 +2,9 @@
 
 namespace Drupal\Tests\test_traits\Kernel\Testing\Concerns;
 
-/**
- * To be used in KernelTests
- * Use this when asserting a responses content that includes a template defined in a theme
- */
 trait InstallsTheme
 {
-    public function installTheme(string $theme): void
+    public function installTheme(string $theme): self
     {
         $this->container
             ->get('theme_installer')
@@ -21,5 +17,7 @@ trait InstallsTheme
             ->save();
 
         $this->container->set('theme.registry', null);
+
+        return $this;
     }
 }
