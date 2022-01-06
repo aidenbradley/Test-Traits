@@ -144,7 +144,7 @@ trait MakesHttpRequests
         return $this;
     }
 
-    protected function followRedirects(Response $response)
+    private function followRedirects(Response $response)
     {
         $this->followRedirects = false;
 
