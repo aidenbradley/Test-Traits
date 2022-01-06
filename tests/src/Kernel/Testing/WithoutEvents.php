@@ -22,7 +22,7 @@ trait WithoutEvents
     {
         $dispatcher = $this->prophesize(EventDispatcherInterface::class);
 
-        $dispatcher->dispatch(Argument::any(), Argument::type('string'))->will([
+        $dispatcher->dispatch(Argument::any(), Argument::any('string'))->will([
             $this, 'registerDispatchedEvent'
         ]);
 
@@ -49,7 +49,7 @@ trait WithoutEvents
     {
         $firedEvents = $this->getFiredEvents($event);
 
-        $this->assertTrue($firedEvents->isNotEmpty());
+        $this->assertTrue($firedEvents->isNotEmpty(), $event . ' event was not dispatched');
 
         if ($callback) {
             $this->assertTrue($callback($firedEvents->first()));
@@ -60,7 +60,7 @@ trait WithoutEvents
 
     public function assertNotDispatched($event): self
     {
-        $this->assertTrue($this->getFiredEvents($event)->isEmpty());
+        $this->assertTrue($this->getFiredEvents($event)->isEmpty(), $event . ' event was dispatched');
 
         return $this;
     }
@@ -74,13 +74,13 @@ trait WithoutEvents
     {
         if (isset($this->expectedEvents)) {
             foreach ($this->expectedEvents as $event) {
-                $this->assertTrue($this->getFiredEvents($event)->isNotEmpty(), $event . ' event was not dispatched');
+                $this->assertDispatched($event);
             }
         }
 
         if (isset($this->nonExpectedEvents)) {
             foreach ($this->nonExpectedEvents as $event) {
-                $this->assertTrue($this->getFiredEvents($event)->isEmpty(), $event . ' event was not dispatched');
+                $this->assertNotDispatched($event);
             }
         }
 
