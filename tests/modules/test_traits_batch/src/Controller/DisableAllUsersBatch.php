@@ -40,9 +40,7 @@ class DisableAllUsersBatch implements ContainerInjectionInterface
             $builder->addOperation([$this, 'disableUser'], [$user]);
         }
 
-        batch_set(array_merge($builder->toArray(), [
-            'progressive' => false,
-        ]));
+        batch_set($builder->toArray());
 
         return Response::create('', 204);
     }
