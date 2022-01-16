@@ -8,6 +8,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\user\Entity\User;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 class DisableAllUsersBatch implements ContainerInjectionInterface
 {
@@ -26,7 +27,7 @@ class DisableAllUsersBatch implements ContainerInjectionInterface
         $this->userStorage = $userStorage;
     }
 
-    public function prepareBatch(): void
+    public function prepareBatch(): Response
     {
         $builder = new BatchBuilder();
         $builder->setTitle('Disable Users')
@@ -39,7 +40,11 @@ class DisableAllUsersBatch implements ContainerInjectionInterface
             $builder->addOperation([$this, 'disableUser'], [$user]);
         }
 
-        batch_set($builder->toArray());
+        batch_set(array_merge($builder->toArray(), [
+            'progressive' => false,
+        ]));
+
+        return Response::create('', 204);
     }
 
     public function prepareBatchAndProcess(): RedirectResponse
