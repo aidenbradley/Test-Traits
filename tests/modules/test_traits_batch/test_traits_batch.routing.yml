@@ -1,0 +1,17 @@
+disable_all_users.prepare_batch:
+  path: '/prepare-users-disable-batch'
+  defaults:
+    _controller: '\Drupal\test_traits_batch\Controller\DisableAllUsersBatch::prepareBatch'
+  options:
+    no_cache: TRUE
+  requirements:
+    _access: 'TRUE'
+
+  disable_all_users.prepare_and_process_batch:
+    path: '/prepare-and-process-users-disable-batch'
+    defaults:
+      _controller: '\Drupal\test_traits_batch\Controller\DisableAllUsersBatch::prepareBatchAndProcess'
+    options:
+      no_cache: TRUE
+    requirements:
+      _access: 'TRUE'
