@@ -16,7 +16,7 @@ trait InstallsModules
             if (isset($infoYaml['dependencies']) === false) {
                 $this->enableModules((array) $module);
 
-                return;
+                continue;
             }
 
             $cleanedDependencies = array_map(function ($dependency) {
