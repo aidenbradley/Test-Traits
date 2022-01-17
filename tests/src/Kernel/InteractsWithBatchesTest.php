@@ -18,17 +18,12 @@ class InteractsWithBatchesTest extends KernelTestBase
         'test_traits_batch',
     ];
 
-    /** @var \Drupal\user\UserStorage */
-    private $userStorage;
-
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->installEntitySchema('user');
         $this->installSchema('system', 'sequences');
-
-        $this->userStorage = $this->container->get('entity_type.manager')->getStorage('user');
     }
 
     /** @test */
@@ -42,13 +37,15 @@ class InteractsWithBatchesTest extends KernelTestBase
 
         $this->runLatestBatch();
 
-        $disabledUserOne = $this->userStorage->load(1);
+        $userStorage = $this->container->get('entity_type.manager')->getStorage('user');
+
+        $disabledUserOne = $userStorage->load(1);
         $this->assertEquals(0, $disabledUserOne->status->value);
 
-        $disabledUserTwo = $this->userStorage->load(2);
+        $disabledUserTwo = $userStorage->load(2);
         $this->assertEquals(0, $disabledUserTwo->status->value);
 
-        $disabledUserThree = $this->userStorage->load(3);
+        $disabledUserThree = $userStorage->load(3);
         $this->assertEquals(0, $disabledUserThree->status->value);
     }
 
@@ -77,7 +74,7 @@ class InteractsWithBatchesTest extends KernelTestBase
 
     private function createDisabledUser(string $name): self
     {
-        $this->userStorage->create([
+        $this->container->get('entity_type.manager')->getStorage('user')->create([
             'status' => 1,
             'mail' => $name . '@example.com',
             'name' => $name,
