@@ -63,13 +63,15 @@ class InteractsWithBatchesTest extends KernelTestBase
 
         $this->runBatch();
 
-        $disabledUserOne = $this->userStorage->load(1);
+        $userStorage = $this->container->get('entity_type.manager')->getStorage('user');
+
+        $disabledUserOne = $userStorage->load(1);
         $this->assertEquals(0, $disabledUserOne->status->value);
 
-        $disabledUserTwo = $this->userStorage->load(2);
+        $disabledUserTwo = $userStorage->load(2);
         $this->assertEquals(0, $disabledUserTwo->status->value);
 
-        $disabledUserThree = $this->userStorage->load(3);
+        $disabledUserThree = $userStorage->load(3);
         $this->assertEquals(0, $disabledUserThree->status->value);
     }
 

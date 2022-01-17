@@ -52,7 +52,7 @@ class DisableAllUsersBatch implements ContainerInjectionInterface
         return batch_process('/');
     }
 
-    public function disableUser(User $user)
+    public function disableUser($user)
     {
         $user->status->value = 0;
 
