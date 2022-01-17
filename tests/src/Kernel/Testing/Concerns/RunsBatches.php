@@ -2,7 +2,7 @@
 
 namespace Drupal\Tests\test_traits\Kernel\Testing\Concerns;
 
-trait InteractsWithBatches
+trait RunsBatches
 {
     public function runLatestBatch(string $redirect = '/'): self
     {
