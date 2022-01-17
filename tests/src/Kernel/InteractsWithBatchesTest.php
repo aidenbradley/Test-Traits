@@ -32,7 +32,7 @@ class InteractsWithBatchesTest extends KernelTestBase
     }
 
     /** @test */
-    public function set_batch(): void
+    public function run_batch_thats_been_set(): void
     {
         $this->createDisabledUser('disabled_user_one')
             ->createDisabledUser('disabled_user_two')
@@ -40,7 +40,7 @@ class InteractsWithBatchesTest extends KernelTestBase
 
         $this->get($this->route('disable_all_users.prepare_batch'));
 
-        $this->runBatch();
+        $this->runLatestBatch();
 
         $disabledUserOne = $this->userStorage->load(1);
         $this->assertEquals(0, $disabledUserOne->status->value);
@@ -53,7 +53,7 @@ class InteractsWithBatchesTest extends KernelTestBase
     }
 
     /** @test */
-    public function process_batch(): void
+    public function run_batch_thats_been_processed(): void
     {
         $this->createDisabledUser('disabled_user_one')
             ->createDisabledUser('disabled_user_two')
@@ -61,7 +61,7 @@ class InteractsWithBatchesTest extends KernelTestBase
 
         $this->get($this->route('disable_all_users.prepare_and_process_batch'));
 
-        $this->runBatch();
+        $this->runLatestBatch();
 
         $userStorage = $this->container->get('entity_type.manager')->getStorage('user');
 

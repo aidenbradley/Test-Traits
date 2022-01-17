@@ -4,7 +4,7 @@ namespace Drupal\Tests\test_traits\Kernel\Testing\Concerns;
 
 trait InteractsWithBatches
 {
-    public function runBatch(string $redirect = '/'): self
+    public function runLatestBatch(string $redirect = '/'): self
     {
         $batch =& batch_get();
 
