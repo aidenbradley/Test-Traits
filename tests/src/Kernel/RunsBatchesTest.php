@@ -29,9 +29,9 @@ class RunsBatchesTest extends KernelTestBase
     /** @test */
     public function run_batch_thats_been_set(): void
     {
-        $this->createEnabledUser('disabled_user_one')
-            ->createEnabledUser('disabled_user_two')
-            ->createEnabledUser('disabled_user_three');
+        $this->createEnabledUser('enabled_user_one')
+            ->createEnabledUser('enabled_user_two')
+            ->createEnabledUser('enabled_user_three');
 
         $this->get($this->route('disable_all_users.prepare_batch'));
 
@@ -52,9 +52,9 @@ class RunsBatchesTest extends KernelTestBase
     /** @test */
     public function run_batch_thats_been_processed(): void
     {
-        $this->createEnabledUser('disabled_user_one')
-            ->createEnabledUser('disabled_user_two')
-            ->createEnabledUser('disabled_user_three');
+        $this->createEnabledUser('enabled_user_one')
+            ->createEnabledUser('enabled_user_two')
+            ->createEnabledUser('enabled_user_three');
 
         $this->get($this->route('disable_all_users.prepare_and_process_batch'));
 
