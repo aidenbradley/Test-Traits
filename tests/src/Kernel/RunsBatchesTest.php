@@ -29,9 +29,9 @@ class RunsBatchesTest extends KernelTestBase
     /** @test */
     public function run_batch_thats_been_set(): void
     {
-        $this->createDisabledUser('disabled_user_one')
-            ->createDisabledUser('disabled_user_two')
-            ->createDisabledUser('disabled_user_three');
+        $this->createEnabledUser('disabled_user_one')
+            ->createEnabledUser('disabled_user_two')
+            ->createEnabledUser('disabled_user_three');
 
         $this->get($this->route('disable_all_users.prepare_batch'));
 
@@ -52,9 +52,9 @@ class RunsBatchesTest extends KernelTestBase
     /** @test */
     public function run_batch_thats_been_processed(): void
     {
-        $this->createDisabledUser('disabled_user_one')
-            ->createDisabledUser('disabled_user_two')
-            ->createDisabledUser('disabled_user_three');
+        $this->createEnabledUser('disabled_user_one')
+            ->createEnabledUser('disabled_user_two')
+            ->createEnabledUser('disabled_user_three');
 
         $this->get($this->route('disable_all_users.prepare_and_process_batch'));
 
@@ -72,7 +72,7 @@ class RunsBatchesTest extends KernelTestBase
         $this->assertEquals(0, $disabledUserThree->status->value);
     }
 
-    private function createDisabledUser(string $name): self
+    private function createEnabledUser(string $name): self
     {
         $this->container->get('entity_type.manager')->getStorage('user')->create([
             'status' => 1,
