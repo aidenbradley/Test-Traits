@@ -3,6 +3,7 @@
 namespace Drupal\Tests\test_traits\Kernel;
 
 use Drupal\Component\EventDispatcher\Event;
+use Drupal\locale\LocaleEvent;
 use Drupal\Tests\test_traits\Kernel\Testing\WithoutEvents;
 use Drupal\Tests\token\Kernel\KernelTestBase;
 
@@ -22,7 +23,7 @@ class WithoutEventsTest extends KernelTestBase
     }
 
     /** @test */
-    public function expects_events(): void
+    public function expects_events_class_string(): void
     {
         $this->expectsEvents(Event::class);
 
@@ -30,7 +31,23 @@ class WithoutEventsTest extends KernelTestBase
     }
 
     /** @test */
-    public function doesnt_expect_events(): void
+    public function expects_events_event_name(): void
+    {
+        $this->expectsEvents('test_event');
+
+        $this->container->get('event_dispatcher')->dispatch(new Event(), 'test_event');
+    }
+
+    /** @test */
+    public function doesnt_expect_events_class_string(): void
+    {
+        $this->doesntExpectEvents(Event::class);
+
+        $this->container->get('event_dispatcher')->dispatch(new LocaleEvent([]), 'second_event');
+    }
+
+    /** @test */
+    public function doesnt_expect_events_event_name(): void
     {
         $this->doesntExpectEvents('first_event');
 

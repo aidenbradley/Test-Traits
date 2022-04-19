@@ -22,7 +22,7 @@ trait WithoutEvents
     {
         $dispatcher = $this->prophesize(EventDispatcherInterface::class);
 
-        $dispatcher->dispatch(Argument::any(), Argument::any('string'))->will([
+        $dispatcher->dispatch(Argument::any(), Argument::any())->will([
             $this, 'registerDispatchedEvent'
         ]);
 
