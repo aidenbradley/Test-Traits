@@ -14,6 +14,16 @@ class InteractsWithLanguagesTest extends KernelTestBase
         'system',
     ];
 
+    /** @var string */
+    private $customConfigDirectory;
+
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $this->setConfigDirectory('languages');
+    }
+
     /** @test */
     public function install_languages(): void
     {
@@ -39,8 +49,59 @@ class InteractsWithLanguagesTest extends KernelTestBase
         $this->assertEquals('fr', $this->languageManager()->getCurrentLanguage()->getId());
     }
 
+    /** @test */
+    public function set_current_language_when_creating_entity(): void
+    {
+        $this->enableModules([
+            'node',
+            'user',
+        ]);
+        $this->setConfigDirectory('node/bundles');
+
+        $this->installEntitySchemaWithBundles('node', 'page');
+        $this->installEntitySchema('user');
+
+        $this->setConfigDirectory('languages');
+
+        $enNode = $this->container->get('entity_type.manager')->getStorage('node')->create([
+            'title' => 'EN Node',
+            'type' => 'page',
+        ]);
+        $enNode->save();
+        $this->assertEquals('en', $enNode->language()->getId());
+
+        $this->setCurrentLanguage('fr');
+        $frNode = $this->container->get('entity_type.manager')->getStorage('node')->create([
+            'title' => 'FR Node',
+            'type' => 'page',
+        ]);
+        $frNode->save();
+        $this->assertEquals('fr', $frNode->language()->getId());
+
+        $this->setCurrentLanguage('de');
+        $deNode = $this->container->get('entity_type.manager')->getStorage('node')->create([
+            'title' => 'DE Node',
+            'type' => 'page',
+        ]);
+        $deNode->save();
+        $this->assertEquals('de', $deNode->language()->getId());
+    }
+
     protected function configDirectory(): string
     {
-        return __DIR__ . '/__fixtures__/config/sync/languages';
+        $baseConfigPath = __DIR__ . '/__fixtures__/config/sync';
+
+        if ($this->customConfigDirectory) {
+            return $baseConfigPath . '/' . ltrim($this->customConfigDirectory, '/');
+        }
+
+        // providing our own directory with config we can test against
+        return $baseConfigPath;
+    }
+
+    /** sets the config directory relative to the __fixtures__ directory */
+    private function setConfigDirectory(string $directory): void
+    {
+        $this->customConfigDirectory = $directory;
     }
 }
