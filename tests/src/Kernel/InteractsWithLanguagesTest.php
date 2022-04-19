@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\test_traits\Kernel;
 
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\node\Entity\Node;
 use Drupal\Tests\test_traits\Kernel\Testing\Concerns\InteractsWithLanguages;
@@ -56,7 +57,6 @@ class InteractsWithLanguagesTest extends KernelTestBase
         $this->enableModules([
             'node',
             'user',
-            'path_alias',
         ]);
         $this->setConfigDirectory('node/bundles');
 
@@ -65,33 +65,37 @@ class InteractsWithLanguagesTest extends KernelTestBase
 
         $this->setConfigDirectory('languages');
 
-//        $enNode = $this->container->get('entity_type.manager')->getStorage('node')->create([
-//            'title' => 'EN Node',
-//            'type' => 'page',
-//        ]);
-//        $enNode->save();
-//        $this->assertEquals('en', $enNode->language()->getId());
-//
-//        $this->setCurrentLanguage('fr');
-//        $frNode = $this->container->get('entity_type.manager')->getStorage('node')->create([
-//            'title' => 'FR Node',
-//            'type' => 'page',
-//        ]);
-//        $frNode->save();
-//        $this->assertEquals('fr', $frNode->language()->getId());
+        $enNode = $this->nodeStorage()->create([
+            'title' => 'EN Node',
+            'type' => 'page',
+            'langcode' => 'en',
+        ]);
+        $enNode->save();
+        $this->assertEquals('en', $enNode->language()->getId());
+
+        $this->setCurrentLanguage('fr');
+        $frNode = $this->nodeStorage()->create([
+            'title' => 'FR Node',
+            'type' => 'page',
+            'langcode' => 'fr',
+        ]);
+        $frNode->save();
+        $this->assertEquals('fr', $frNode->language()->getId());
 
         $this->setCurrentLanguage('de');
 
         $this->assertEquals('de', $this->languageManager()->getCurrentLanguage()->getId());
-        $deNode = $this->container->get('entity_type.manager')->getStorage('node')->create([
+        $deNode = $this->nodeStorage()->create([
             'title' => 'DE Node',
             'type' => 'page',
             'langcode' => 'de',
         ]);
+
         $deNode->save();
+
         $deNode = Node::load($deNode->id())->getTranslation('de');
         $this->assertEquals('de', $deNode->language()->getId());
-        $this->assertEquals('de', $this->languageManager()->getCurrentLanguage()->getId());
+
         dump('translated url ' . $deNode->toUrl()->toString(true)->getGeneratedUrl());
     }
 
@@ -109,7 +113,7 @@ class InteractsWithLanguagesTest extends KernelTestBase
 
         $this->setConfigDirectory('languages');
 
-        $enNode = $this->container->get('entity_type.manager')->getStorage('node')->create([
+        $enNode = $this->nodeStorage()->create([
             'title' => 'EN Node',
             'type' => 'page',
         ]);
@@ -117,7 +121,7 @@ class InteractsWithLanguagesTest extends KernelTestBase
         $this->assertEquals('en', $enNode->language()->getId());
 
         $this->setCurrentLanguage('fr');
-        $frNode = $this->container->get('entity_type.manager')->getStorage('node')->create([
+        $frNode = $this->nodeStorage()->create([
             'title' => 'FR Node',
             'type' => 'page',
         ]);
@@ -125,7 +129,7 @@ class InteractsWithLanguagesTest extends KernelTestBase
         $this->assertEquals('fr', $frNode->language()->getId());
 
         $this->setCurrentLanguage('de');
-        $deNode = $this->container->get('entity_type.manager')->getStorage('node')->create([
+        $deNode = $this->nodeStorage()->create([
             'title' => 'DE Node',
             'type' => 'page',
         ]);
@@ -149,5 +153,10 @@ class InteractsWithLanguagesTest extends KernelTestBase
     private function setConfigDirectory(string $directory): void
     {
         $this->customConfigDirectory = $directory;
+    }
+
+    private function nodeStorage(): EntityStorageInterface
+    {
+        return $this->container->get('entity_type.manager')->getStorage('node');
     }
 }
