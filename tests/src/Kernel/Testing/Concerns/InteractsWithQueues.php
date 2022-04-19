@@ -45,22 +45,9 @@ trait InteractsWithQueues
             }
 
             $queueWorker->processItem($item->data);
+
             $queue->deleteItem($item);
         }
-    }
-
-    public function useReliableQueues(): self
-    {
-        $this->useReliableQueues = true;
-
-        return $this;
-    }
-
-    public function dontUseReliableQueues(): self
-    {
-        $this->useReliableQueues = false;
-
-        return $this;
     }
 
     private function getQueueByName(string $queueName, bool $useReliableQueue): QueueInterface
