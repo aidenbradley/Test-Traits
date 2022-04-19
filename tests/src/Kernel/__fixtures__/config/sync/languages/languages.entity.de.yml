@@ -1,0 +1,9 @@
+uuid: ff5995ff-c176-4959-974b-29905c460e16
+langcode: de
+status: true
+dependencies: {  }
+id: de
+label: Germany
+direction: ltr
+weight: -6
+locked: false
