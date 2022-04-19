@@ -32,7 +32,7 @@ trait InteractsWithLanguages
     }
 
     /** @param \Drupal\Language\Entity\ConfigurableLanguage|string */
-    protected function setCurrentLanguage($language): void
+    protected function setCurrentLanguage($language, ?string $prefix = null): void
     {
         $this->setupLanguageDependencies();
 
@@ -46,7 +46,19 @@ trait InteractsWithLanguages
             )->load($language);
         }
 
+        if ($prefix !== null) {
+            $languageNegotiation = $this->config('language.negotiation');
+
+            $prefixes = $languageNegotiation->get('url.prefixes');
+
+            $prefixes[$language->id()] = $prefix;
+
+            $languageNegotiation->set('url.prefixes', $prefixes)->save();
+        }
+
         $this->container->get('language.default')->set($language);
+
+        $this->languageManager()->reset();
 
         $this->installedLanguages[$language->getId()] = $language;
     }
@@ -57,14 +69,30 @@ trait InteractsWithLanguages
             return;
         }
 
-        $this->enableModules(['language']);
+        $this->enableModules(['language', 'content_translation']);
         $this->installConfig('language');
         $this->installEntitySchema('configurable_language');
-        $this->config('language.negotiation')->set('url.prefixes', [
-            'en' => '',
-            'fr' => 'fr-fr',
-            'de' => 'de-de',
+        $this->installEntitySchema('language_content_settings');
+
+        $this->container->get('entity_type.manager')->getStorage('language_content_settings')->create([
+            'target_entity_type_id' => 'node',
+            'target_bundle' => 'page',
         ])->save();
+
+        $this->container->get('content_translation.manager')->setEnabled('node', 'page', TRUE);
+
+//        $this->config('language.negotiation')->set('url.prefixes', [
+//            'en' => '',
+//            'fr' => 'fr-fr',
+//            'de' => 'de-de-de',
+//        ])->save();
+
+        \Drupal::service('kernel')->rebuildContainer();
+
+        \Drupal::service('router.builder')->rebuild();
+
+        \Drupal::languageManager()->reset();
+
         $this->installLanguageModule = true;
     }
 }

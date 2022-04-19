@@ -3,6 +3,7 @@
 namespace Drupal\Tests\test_traits\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\node\Entity\Node;
 use Drupal\Tests\test_traits\Kernel\Testing\Concerns\InteractsWithLanguages;
 use Throwable;
 
@@ -47,6 +48,51 @@ class InteractsWithLanguagesTest extends KernelTestBase
 
         $this->setCurrentLanguage('fr');
         $this->assertEquals('fr', $this->languageManager()->getCurrentLanguage()->getId());
+    }
+
+    /** @test */
+    public function set_current_language_with_prefix(): void
+    {
+        $this->enableModules([
+            'node',
+            'user',
+            'path_alias',
+        ]);
+        $this->setConfigDirectory('node/bundles');
+
+        $this->installEntitySchemaWithBundles('node', 'page');
+        $this->installEntitySchema('user');
+
+        $this->setConfigDirectory('languages');
+
+//        $enNode = $this->container->get('entity_type.manager')->getStorage('node')->create([
+//            'title' => 'EN Node',
+//            'type' => 'page',
+//        ]);
+//        $enNode->save();
+//        $this->assertEquals('en', $enNode->language()->getId());
+//
+//        $this->setCurrentLanguage('fr');
+//        $frNode = $this->container->get('entity_type.manager')->getStorage('node')->create([
+//            'title' => 'FR Node',
+//            'type' => 'page',
+//        ]);
+//        $frNode->save();
+//        $this->assertEquals('fr', $frNode->language()->getId());
+
+        $this->setCurrentLanguage('de');
+
+        $this->assertEquals('de', $this->languageManager()->getCurrentLanguage()->getId());
+        $deNode = $this->container->get('entity_type.manager')->getStorage('node')->create([
+            'title' => 'DE Node',
+            'type' => 'page',
+            'langcode' => 'de',
+        ]);
+        $deNode->save();
+        $deNode = Node::load($deNode->id())->getTranslation('de');
+        $this->assertEquals('de', $deNode->language()->getId());
+        $this->assertEquals('de', $this->languageManager()->getCurrentLanguage()->getId());
+        dump('translated url ' . $deNode->toUrl()->toString(true)->getGeneratedUrl());
     }
 
     /** @test */
