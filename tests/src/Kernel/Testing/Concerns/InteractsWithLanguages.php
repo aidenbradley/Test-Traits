@@ -2,10 +2,18 @@
 
 namespace Drupal\Tests\test_traits\Kernel\Testing\Concerns;
 
+use Drupal\Core\Language\LanguageManagerInterface;
+
 trait InteractsWithLanguages
 {
     use InstallsExportedConfig;
 
+    /** @var array */
+    protected $installedLanguages = [
+        'en' // EN is installed by default
+    ];
+
+    /** @var bool */
     protected $installLanguageModule = false;
 
     private function setupLanguageDependencies(): void
@@ -45,7 +53,9 @@ trait InteractsWithLanguages
                 $this->installLanguage($language);
             }
 
-            $language = $this->storage('configurable_language')->load($language);
+            $language = $this->container->get('entity_type.manager')->getStorage(
+                'configurable_language'
+            )->load($language);
         }
 
         $systemConfig = $this->config('system.site');
@@ -59,5 +69,10 @@ trait InteractsWithLanguages
         $this->container->get('language_manager')->reset();
 
         $this->installedLanguages[$language->getId()] = $language;
+    }
+
+    public function languageManager(): LanguageManagerInterface
+    {
+        return $this->container->get('language_manager');
     }
 }

@@ -4,25 +4,43 @@ namespace Drupal\Tests\test_traits\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\test_traits\Kernel\Testing\Concerns\InteractsWithLanguages;
+use Throwable;
 
 class InteractsWithLanguagesTest extends KernelTestBase
 {
     use InteractsWithLanguages;
 
-    private $languageManager;
+    protected static $modules = [
+        'system',
+    ];
 
-    protected function setUp(): void
+    /** @test */
+    public function install_languages(): void
     {
-        parent::setUp();
+        $this->assertArrayNotHasKey('de', $this->languageManager()->getLanguages());
+        $this->installLanguage('de');
+        $this->assertArrayHasKey('de', $this->languageManager()->getLanguages());
 
-        $this->languageManager = $this->container->get('language_manager');
+        $this->assertArrayNotHasKey('fr', $this->languageManager()->getLanguages());
+        $this->installLanguage('fr');
+        $this->assertArrayHasKey('fr', $this->languageManager()->getLanguages());
     }
 
     /** @test */
-    public function installs_language(): void
+    public function set_current_language(): void
     {
         $this->setCurrentLanguage('en');
+        $this->assertEquals('en', $this->languageManager()->getCurrentLanguage()->getId());
 
-        $this->assertEquals('en', $this->container);
+        $this->setCurrentLanguage('de');
+        $this->assertEquals('de', $this->languageManager()->getCurrentLanguage()->getId());
+
+        $this->setCurrentLanguage('fr');
+        $this->assertEquals('fr', $this->languageManager()->getCurrentLanguage()->getId());
+    }
+
+    protected function configDirectory(): string
+    {
+        return __DIR__ . '/__fixtures__/config/sync/languages';
     }
 }
