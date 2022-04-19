@@ -16,21 +16,9 @@ trait InteractsWithLanguages
     /** @var bool */
     protected $installLanguageModule = false;
 
-    private function setupLanguageDependencies(): void
+    public function languageManager(): LanguageManagerInterface
     {
-        if ($this->installLanguageModule) {
-            return;
-        }
-
-        $this->enableModules(['language']);
-        $this->installConfig('language');
-        $this->installEntitySchema('configurable_language');
-        $this->config('language.negotiation')->set('url.prefixes', [
-            'en' => '',
-            'fr' => 'fr-fr',
-            'de' => 'de-de',
-        ])->save();
-        $this->installLanguageModule = true;
+        return $this->container->get('language_manager');
     }
 
     /** @param string|array $langcode */
@@ -58,21 +46,25 @@ trait InteractsWithLanguages
             )->load($language);
         }
 
-        $systemConfig = $this->config('system.site');
-
-        $systemConfig->set('langcode', $language->getId());
-        $systemConfig->set('default_langcode', $language->getId());
-        $systemConfig->save();
-
         $this->container->get('language.default')->set($language);
-
-        $this->container->get('language_manager')->reset();
 
         $this->installedLanguages[$language->getId()] = $language;
     }
 
-    public function languageManager(): LanguageManagerInterface
+    private function setupLanguageDependencies(): void
     {
-        return $this->container->get('language_manager');
+        if ($this->installLanguageModule) {
+            return;
+        }
+
+        $this->enableModules(['language']);
+        $this->installConfig('language');
+        $this->installEntitySchema('configurable_language');
+        $this->config('language.negotiation')->set('url.prefixes', [
+            'en' => '',
+            'fr' => 'fr-fr',
+            'de' => 'de-de',
+        ])->save();
+        $this->installLanguageModule = true;
     }
 }
