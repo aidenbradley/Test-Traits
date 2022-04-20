@@ -56,6 +56,17 @@ class RunsBatchesTest extends KernelTestBase
             ->createEnabledUser('enabled_user_two')
             ->createEnabledUser('enabled_user_three');
 
+        $userStorage = $this->container->get('entity_type.manager')->getStorage('user');
+
+        $disabledUserOne = $userStorage->load(1);
+        $this->assertEquals(1, $disabledUserOne->status->value);
+
+        $disabledUserTwo = $userStorage->load(2);
+        $this->assertEquals(1, $disabledUserTwo->status->value);
+
+        $disabledUserThree = $userStorage->load(3);
+        $this->assertEquals(1, $disabledUserThree->status->value);
+
         $this->get($this->route('disable_all_users.prepare_and_process_batch'));
 
         $this->runLatestBatch();
