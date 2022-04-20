@@ -4,9 +4,7 @@ namespace Drupal\Tests\test_traits\Kernel;
 
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\KernelTests\KernelTestBase;
-use Drupal\node\Entity\Node;
 use Drupal\Tests\test_traits\Kernel\Testing\Concerns\InteractsWithLanguages;
-use Throwable;
 
 class InteractsWithLanguagesTest extends KernelTestBase
 {
@@ -65,38 +63,34 @@ class InteractsWithLanguagesTest extends KernelTestBase
 
         $this->setConfigDirectory('languages');
 
-        $enNode = $this->nodeStorage()->create([
+        $noPrefixEnNode = $this->nodeStorage()->create([
+            'nid' => '1000',
             'title' => 'EN Node',
             'type' => 'page',
             'langcode' => 'en',
         ]);
-        $enNode->save();
-        $this->assertEquals('en', $enNode->language()->getId());
+        $noPrefixEnNode->save();
+        $this->assertEquals('/node/1000', $noPrefixEnNode->toUrl()->toString(true)->getGeneratedUrl());
 
-        $this->setCurrentLanguage('fr');
-        $frNode = $this->nodeStorage()->create([
+        $this->setCurrentLanguage('fr', 'fr-fr');
+        $frFrNode = $this->nodeStorage()->create([
+            'nid' => '2000',
             'title' => 'FR Node',
             'type' => 'page',
             'langcode' => 'fr',
         ]);
-        $frNode->save();
-        $this->assertEquals('fr', $frNode->language()->getId());
+        $frFrNode->save();
+        $this->assertEquals('/fr-fr/node/2000', $frFrNode->toUrl()->toString(true)->getGeneratedUrl());
 
-        $this->setCurrentLanguage('de');
-
-        $this->assertEquals('de', $this->languageManager()->getCurrentLanguage()->getId());
-        $deNode = $this->nodeStorage()->create([
-            'title' => 'DE Node',
+        $this->setCurrentLanguage('fr', 'fr-prefix');
+        $frPrefixNode = $this->nodeStorage()->create([
+            'nid' => '3000',
+            'title' => 'FR Node',
             'type' => 'page',
-            'langcode' => 'de',
+            'langcode' => 'fr',
         ]);
-
-        $deNode->save();
-
-        $deNode = Node::load($deNode->id())->getTranslation('de');
-        $this->assertEquals('de', $deNode->language()->getId());
-
-        dump('translated url ' . $deNode->toUrl()->toString(true)->getGeneratedUrl());
+        $frPrefixNode->save();
+        $this->assertEquals('/fr-prefix/node/3000', $frPrefixNode->toUrl()->toString(true)->getGeneratedUrl());
     }
 
     /** @test */
