@@ -16,7 +16,7 @@ trait InteractsWithLanguages
     /** @var bool */
     protected $installLanguageModule = false;
 
-    public function languageManager(): LanguageManagerInterface
+    protected function languageManager(): LanguageManagerInterface
     {
         return $this->container->get('language_manager');
     }
@@ -46,11 +46,10 @@ trait InteractsWithLanguages
             )->load($language);
         }
 
-        $systemConfig = $this->config('system.site');
-
-        $systemConfig->set('langcode', $language->getId());
-        $systemConfig->set('default_langcode', $language->getId());
-        $systemConfig->save();
+        $this->config('system.site')
+            ->set('langcode', $language->getId())
+            ->set('default_langcode', $language->getId())
+            ->save();
 
         if ($prefix !== null) {
             $languageNegotiation = $this->config('language.negotiation');
@@ -64,7 +63,7 @@ trait InteractsWithLanguages
 
         $this->container->get('language.default')->set($language);
 
-        \Drupal::service('kernel')->rebuildContainer();
+        $this->container->get('kernel')->rebuildContainer();
 
         $this->languageManager()->reset();
 

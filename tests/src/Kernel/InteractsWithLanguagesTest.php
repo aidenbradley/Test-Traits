@@ -67,7 +67,6 @@ class InteractsWithLanguagesTest extends KernelTestBase
             'nid' => '1000',
             'title' => 'EN Node',
             'type' => 'page',
-            'langcode' => 'en',
         ]);
         $noPrefixEnNode->save();
         $this->assertEquals('/node/1000', $noPrefixEnNode->toUrl()->toString(true)->getGeneratedUrl());
@@ -77,7 +76,6 @@ class InteractsWithLanguagesTest extends KernelTestBase
             'nid' => '2000',
             'title' => 'FR Node',
             'type' => 'page',
-            'langcode' => 'fr',
         ]);
         $frFrNode->save();
         $this->assertEquals('/fr-fr/node/2000', $frFrNode->toUrl()->toString(true)->getGeneratedUrl());
@@ -87,10 +85,18 @@ class InteractsWithLanguagesTest extends KernelTestBase
             'nid' => '3000',
             'title' => 'FR Node',
             'type' => 'page',
-            'langcode' => 'fr',
         ]);
         $frPrefixNode->save();
         $this->assertEquals('/fr-prefix/node/3000', $frPrefixNode->toUrl()->toString(true)->getGeneratedUrl());
+
+        $this->setCurrentLanguage('de', 'german-prefix');
+        $deNode = $this->nodeStorage()->create([
+            'nid' => '4000',
+            'title' => 'DE Node',
+            'type' => 'page',
+        ]);
+        $deNode->save();
+        $this->assertEquals('/german-prefix/node/4000', $deNode->toUrl()->toString(true)->getGeneratedUrl());
     }
 
     /** @test */
