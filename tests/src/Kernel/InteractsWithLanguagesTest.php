@@ -14,14 +14,11 @@ class InteractsWithLanguagesTest extends KernelTestBase
         'system',
     ];
 
-    /** @var string */
-    private $customConfigDirectory;
-
     protected function setUp()
     {
         parent::setUp();
 
-        $this->setConfigDirectory('languages');
+        $this->setConfigDirectory(__DIR__ . '/__fixtures__/config/sync/languages');
     }
 
     /** @test */
@@ -56,12 +53,12 @@ class InteractsWithLanguagesTest extends KernelTestBase
             'node',
             'user',
         ]);
-        $this->setConfigDirectory('node/bundles');
+        $this->setConfigDirectory(__DIR__ . '/__fixtures__/config/sync/node/bundles');
 
         $this->installEntitySchemaWithBundles('node', 'page');
         $this->installEntitySchema('user');
 
-        $this->setConfigDirectory('languages');
+        $this->setConfigDirectory(__DIR__ . '/__fixtures__/config/sync/languages');
 
         $noPrefixEnNode = $this->nodeStorage()->create([
             'nid' => '1000',
@@ -106,12 +103,12 @@ class InteractsWithLanguagesTest extends KernelTestBase
             'node',
             'user',
         ]);
-        $this->setConfigDirectory('node/bundles');
+        $this->setConfigDirectory(__DIR__ . '/__fixtures__/config/sync/node/bundles');
 
         $this->installEntitySchemaWithBundles('node', 'page');
         $this->installEntitySchema('user');
 
-        $this->setConfigDirectory('languages');
+        $this->setConfigDirectory(__DIR__ . '/__fixtures__/config/sync/languages');
 
         $enNode = $this->nodeStorage()->create([
             'title' => 'EN Node',
@@ -135,24 +132,6 @@ class InteractsWithLanguagesTest extends KernelTestBase
         ]);
         $deNode->save();
         $this->assertEquals('de', $deNode->language()->getId());
-    }
-
-    protected function configDirectory(): string
-    {
-        $baseConfigPath = __DIR__ . '/__fixtures__/config/sync';
-
-        if ($this->customConfigDirectory) {
-            return $baseConfigPath . '/' . ltrim($this->customConfigDirectory, '/');
-        }
-
-        // providing our own directory with config we can test against
-        return $baseConfigPath;
-    }
-
-    /** sets the config directory relative to the __fixtures__ directory */
-    private function setConfigDirectory(string $directory): void
-    {
-        $this->customConfigDirectory = $directory;
     }
 
     private function nodeStorage(): EntityStorageInterface

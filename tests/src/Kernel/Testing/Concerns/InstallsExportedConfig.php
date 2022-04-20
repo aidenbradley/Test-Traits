@@ -9,6 +9,12 @@ use Drupal\Tests\test_traits\Kernel\Testing\Exceptions\ConfigInstallFailed;
 /** This trait may be used to test fields stored as field configs */
 trait InstallsExportedConfig
 {
+    /** @var string */
+    private $useVfsConfigDirectory = false;
+
+    /** @var string */
+    private $customConfigDirectory;
+
     /** @var array */
     protected $installedConfig = [];
 
@@ -148,6 +154,31 @@ trait InstallsExportedConfig
 
     protected function configDirectory(): string
     {
-        return Settings::get('config_sync_directory');
+        if ($this->useVfsConfigDirectory) {
+            return Settings::get('config_sync_directory');
+        }
+
+        if ($this->customConfigDirectory) {
+            return '/' . ltrim($this->customConfigDirectory, '/');
+        }
+
+        $root = $this->container->get('app.root');
+
+        return str_replace('web/', '', $root . '/config/sync');
+    }
+
+    /** sets the config directory relative to the __fixtures__ directory */
+    protected function setConfigDirectory(string $directory): self
+    {
+        $this->customConfigDirectory = $directory;
+
+        return $this;
+    }
+
+    protected function useVfsConfigDirectory(): self
+    {
+        $this->useVfsConfigDirectory = true;
+
+        return $this;
     }
 }
