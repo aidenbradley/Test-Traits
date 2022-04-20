@@ -22,16 +22,13 @@ class InstallsExportedConfigTest extends KernelTestBase
         'user',
     ];
 
-    /** @var bool */
-    private $useVfsConfigDirectory = false;
-
     /** @var string */
     private $customConfigDirectory;
 
     /** @test */
     public function throws_exception_for_bad_config(): void
     {
-        $this->useVfsConfigDirectory = true;
+        $this->useVfsConfigDirectory();
 
         $this->installEntitySchema('node');
 
@@ -46,7 +43,7 @@ class InstallsExportedConfigTest extends KernelTestBase
     /** @test */
     public function installs_config(): void
     {
-        $this->setConfigDirectory('node/bundles');
+        $this->setConfigDirectory(__DIR__ . '/__fixtures__/config/sync/node/bundles');
 
         $nodeTypeStorage = $this->container->get('entity_type.manager')->getStorage('node_type');
 
@@ -66,7 +63,7 @@ class InstallsExportedConfigTest extends KernelTestBase
     /** @test */
     public function install_bundle(): void
     {
-        $this->setConfigDirectory('node/bundles');
+        $this->setConfigDirectory(__DIR__ . '/__fixtures__/config/sync/node/bundles');
 
         $nodeTypeStorage = $this->container->get('entity_type.manager')->getStorage('node_type');
 
@@ -86,7 +83,7 @@ class InstallsExportedConfigTest extends KernelTestBase
     /** @test */
     public function install_bundles(): void
     {
-        $this->setConfigDirectory('node/bundles');
+        $this->setConfigDirectory(__DIR__ . '/__fixtures__/config/sync/node/bundles');
 
         $nodeTypeStorage = $this->container->get('entity_type.manager')->getStorage('node_type');
 
@@ -113,7 +110,7 @@ class InstallsExportedConfigTest extends KernelTestBase
     /** @test */
     public function install_role(): void
     {
-        $this->setConfigDirectory('roles');
+        $this->setConfigDirectory(__DIR__ . '/__fixtures__/config/sync/roles');
 
         $userRoleStorage = $this->container->get('entity_type.manager')->getStorage('user_role');
 
@@ -133,7 +130,7 @@ class InstallsExportedConfigTest extends KernelTestBase
     /** @test */
     public function install_roles(): void
     {
-        $this->setConfigDirectory('roles');
+        $this->setConfigDirectory(__DIR__ . '/__fixtures__/config/sync/roles');
 
         $userRoleStorage = $this->container->get('entity_type.manager')->getStorage('user_role');
 
@@ -164,7 +161,7 @@ class InstallsExportedConfigTest extends KernelTestBase
         ]);
         $this->installEntitySchema('taxonomy_vocabulary');
 
-        $this->setConfigDirectory('taxonomy');
+        $this->setConfigDirectory(__DIR__ . '/__fixtures__/config/sync/taxonomy');
 
         $vocabularyStorage = $this->container->get('entity_type.manager')->getStorage('taxonomy_vocabulary');
 
@@ -189,7 +186,7 @@ class InstallsExportedConfigTest extends KernelTestBase
         ]);
         $this->installEntitySchema('taxonomy_vocabulary');
 
-        $this->setConfigDirectory('taxonomy');
+        $this->setConfigDirectory(__DIR__ . '/__fixtures__/config/sync/taxonomy');
 
         $vocabularyStorage = $this->container->get('entity_type.manager')->getStorage('taxonomy_vocabulary');
 
@@ -222,10 +219,10 @@ class InstallsExportedConfigTest extends KernelTestBase
             'text',
         ]);
 
-        $this->setConfigDirectory('node/bundles');
+        $this->setConfigDirectory(__DIR__ . '/__fixtures__/config/sync/node/bundles');
         $this->installBundle('node', 'page');
 
-        $this->setConfigDirectory('node/fields');
+        $this->setConfigDirectory(__DIR__ . '/__fixtures__/config/sync/node/fields');
 
         $nodeStorage = $this->container->get('entity_type.manager')->getStorage('node');
 
@@ -255,10 +252,10 @@ class InstallsExportedConfigTest extends KernelTestBase
             'text',
         ]);
 
-        $this->setConfigDirectory('node/bundles');
+        $this->setConfigDirectory(__DIR__ . '/__fixtures__/config/sync/node/bundles');
         $this->installBundle('node', 'page');
 
-        $this->setConfigDirectory('node/fields');
+        $this->setConfigDirectory(__DIR__ . '/__fixtures__/config/sync/node/fields');
 
         $nodeStorage = $this->container->get('entity_type.manager')->getStorage('node');
 
@@ -286,7 +283,7 @@ class InstallsExportedConfigTest extends KernelTestBase
     /** @test */
     public function install_entity_schema_with_bundles(): void
     {
-        $this->setConfigDirectory('node/bundles');
+        $this->setConfigDirectory(__DIR__ . '/__fixtures__/config/sync/node/bundles');
 
         $entityTypeManager = $this->container->get('entity_type.manager');
 
@@ -322,7 +319,7 @@ class InstallsExportedConfigTest extends KernelTestBase
         $this->enableModules([
             'image',
         ]);
-        $this->setConfigDirectory('image_styles');
+        $this->setConfigDirectory(__DIR__ . '/__fixtures__/config/sync/image_styles');
 
         $imageStyleStorage = $this->container->get('entity_type.manager')->getStorage('image_style');
 
@@ -345,7 +342,7 @@ class InstallsExportedConfigTest extends KernelTestBase
         $this->enableModules([
             'image',
         ]);
-        $this->setConfigDirectory('image_styles');
+        $this->setConfigDirectory(__DIR__ . '/__fixtures__/config/sync/image_styles');
 
         $imageStyleStorage = $this->container->get('entity_type.manager')->getStorage('image_style');
 
@@ -379,10 +376,10 @@ class InstallsExportedConfigTest extends KernelTestBase
             'text',
         ]);
 
-        $this->setConfigDirectory('node/bundles');
+        $this->setConfigDirectory(__DIR__ . '/__fixtures__/config/sync/node/bundles');
         $this->installBundle('node', 'page');
 
-        $this->setConfigDirectory('node/fields');
+        $this->setConfigDirectory(__DIR__ . '/__fixtures__/config/sync/node/fields');
 
         $nodeStorage = $this->container->get('entity_type.manager')->getStorage('node');
 
@@ -402,27 +399,5 @@ class InstallsExportedConfigTest extends KernelTestBase
 
         $this->assertTrue($node->hasField('body'));
         $this->assertTrue($node->hasField('field_boolean_field'));
-    }
-
-    protected function configDirectory(): string
-    {
-        if ($this->useVfsConfigDirectory) {
-            return $this->InstallsExportedConfigDirectory();
-        }
-
-        $baseConfigPath = __DIR__ . '/__fixtures__/config/sync';
-
-        if ($this->customConfigDirectory) {
-            return $baseConfigPath . '/' . ltrim($this->customConfigDirectory, '/');
-        }
-
-        // providing our own directory with config we can test against
-        return $baseConfigPath;
-    }
-
-    /** sets the config directory relative to the __fixtures__ directory */
-    private function setConfigDirectory(string $directory): void
-    {
-        $this->customConfigDirectory = $directory;
     }
 }
