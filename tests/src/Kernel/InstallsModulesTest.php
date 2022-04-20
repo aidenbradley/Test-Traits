@@ -10,7 +10,7 @@ class InstallsModulesTest extends KernelTestBase
     use InstallsModules;
 
     /** @test */
-    public function installs_dependies(): void
+    public function installs_dependencies(): void
     {
         $moduleHandler = $this->container->get('module_handler');
 
