@@ -4,13 +4,13 @@ namespace Drupal\Tests\test_traits\Kernel;
 
 use Drupal\Core\Url;
 use Drupal\KernelTests\KernelTestBase;
-use Drupal\Tests\test_traits\Kernel\Testing\Concerns\RunsBatches;
+use Drupal\Tests\test_traits\Kernel\Testing\Concerns\InteractsWithBatches;
 use Drupal\Tests\test_traits\Kernel\Testing\Concerns\MakesHttpRequests;
 
-class RunsBatchesTest extends KernelTestBase
+class InteractsWithBatchesTest extends KernelTestBase
 {
     use MakesHttpRequests,
-        RunsBatches;
+        InteractsWithBatches;
 
     protected static $modules = [
         'system',

@@ -69,7 +69,7 @@ class InstallsExportedConfigTest extends KernelTestBase
 
         $this->assertEmpty($nodeTypeStorage->loadMultiple());
 
-        $this->installBundle('node', 'page');
+        $this->installBundles('node', 'page');
 
         $nodeTypes = $nodeTypeStorage->loadMultiple();
 
@@ -116,7 +116,7 @@ class InstallsExportedConfigTest extends KernelTestBase
 
         $this->assertEmpty($userRoleStorage->loadMultiple());
 
-        $this->installRole('editor');
+        $this->installRoles('editor');
 
         $roles = $userRoleStorage->loadMultiple();
 
@@ -167,7 +167,7 @@ class InstallsExportedConfigTest extends KernelTestBase
 
         $this->assertEmpty($vocabularyStorage->loadMultiple());
 
-        $this->installVocabulary('tags');
+        $this->installVocabularies('tags');
 
         $vocabularies = $vocabularyStorage->loadMultiple();
 
@@ -220,7 +220,7 @@ class InstallsExportedConfigTest extends KernelTestBase
         ]);
 
         $this->setConfigDirectory(__DIR__ . '/__fixtures__/config/sync/node/bundles');
-        $this->installBundle('node', 'page');
+        $this->installBundles('node', 'page');
 
         $this->setConfigDirectory(__DIR__ . '/__fixtures__/config/sync/node/fields');
 
@@ -253,7 +253,7 @@ class InstallsExportedConfigTest extends KernelTestBase
         ]);
 
         $this->setConfigDirectory(__DIR__ . '/__fixtures__/config/sync/node/bundles');
-        $this->installBundle('node', 'page');
+        $this->installBundles('node', 'page');
 
         $this->setConfigDirectory(__DIR__ . '/__fixtures__/config/sync/node/fields');
 
@@ -325,7 +325,7 @@ class InstallsExportedConfigTest extends KernelTestBase
 
         $this->assertEmpty($imageStyleStorage->loadMultiple());
 
-        $this->installImageStyle('large');
+        $this->installImageStyles('large');
 
         $imageStyles = $imageStyleStorage->loadMultiple();
 
@@ -377,7 +377,7 @@ class InstallsExportedConfigTest extends KernelTestBase
         ]);
 
         $this->setConfigDirectory(__DIR__ . '/__fixtures__/config/sync/node/bundles');
-        $this->installBundle('node', 'page');
+        $this->installBundles('node', 'page');
 
         $this->setConfigDirectory(__DIR__ . '/__fixtures__/config/sync/node/fields');
 
