@@ -6,7 +6,8 @@ trait InstallsImageStyles
 {
     use InstallsExportedConfig;
 
-    public function installImageStyles(string $imageStyles): self
+    /** @param string|array $imageStyles */
+    public function installImageStyles($imageStyles): self
     {
         foreach ((array) $imageStyles as $imageStyle) {
             $this->installExportedConfig([

@@ -6,9 +6,10 @@ trait InstallsVocabularies
 {
     use InstallsExportedConfig;
 
-    public function installVocabularies(array $vocabularies): self
+    /** @param string|array $vocabularies */
+    public function installVocabularies($vocabularies): self
     {
-        foreach ($vocabularies as $vocabulary) {
+        foreach ((array) $vocabularies as $vocabulary) {
             $this->installExportedConfig([
                 'taxonomy.vocabulary.' . $vocabulary,
             ]);
