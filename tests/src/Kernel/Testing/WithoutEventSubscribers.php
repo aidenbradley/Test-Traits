@@ -85,7 +85,9 @@ trait WithoutEventSubscribers
         $this->ignoredEvents = collect($this->ignoredEvents)->when($event, function(Collection $collection, string $event) {
             return $collection->put($event, $event);
         });
+
         $this->ignoredSubscribers = collect($this->ignoredSubscribers)->put($listener->getServiceId(), $listener);
+
         $this->container->get('event_dispatcher')->removeSubscriber($listener->getOriginal());
 
         return $this;
