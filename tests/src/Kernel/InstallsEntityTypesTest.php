@@ -54,22 +54,13 @@ class InstallsEntityTypesTest extends KernelTestBase
 
         $this->assertEmpty($nodeTypeStorage->loadMultiple());
 
-        $bundlesToInstall = [
+        $this->installBundles('node', [
             'page',
             'news',
-        ];
+        ]);
 
-        $this->installBundles('node', $bundlesToInstall);
-
-        $nodeTypes = $nodeTypeStorage->loadMultiple();
-
-        $this->assertNotEmpty($nodeTypes);
-
-        $nodeTypeIds = array_map(function(NodeType $nodeType) {
-            return $nodeType->id();
-        }, $nodeTypes);
-
-        $this->assertEquals($bundlesToInstall, array_values($nodeTypeIds));
+        $this->assertInstanceOf(NodeType::class, $nodeTypeStorage->load('page'));
+        $this->assertInstanceOf(NodeType::class, $nodeTypeStorage->load('news'));
     }
 
     /** @test */
@@ -83,23 +74,20 @@ class InstallsEntityTypesTest extends KernelTestBase
             $nodeEntityTypeDefinition->getDataTable()
         ));
 
-        $this->assertEmpty($entityTypeManager->getStorage('node_type')->loadMultiple());
+        $nodeTypeStorage = $entityTypeManager->getStorage('node_type');
 
-        $bundlesToInstall = [
+        $this->assertEmpty($nodeTypeStorage->loadMultiple());
+
+        $this->installEntitySchemaWithBundles('node', [
             'page',
             'news',
-        ];
-
-        $this->installEntitySchemaWithBundles('node', $bundlesToInstall);
+        ]);
 
         $this->assertTrue($this->container->get('database')->schema()->tableExists(
             $nodeEntityTypeDefinition->getDataTable()
         ));
 
-        $nodeTypeIds = array_map(function(NodeType $nodeType) {
-            return $nodeType->id();
-        }, $entityTypeManager->getStorage('node_type')->loadMultiple());
-
-        $this->assertEquals($bundlesToInstall, array_values($nodeTypeIds));
+        $this->assertInstanceOf(NodeType::class, $nodeTypeStorage->load('page'));
+        $this->assertInstanceOf(NodeType::class, $nodeTypeStorage->load('news'));
     }
 }
