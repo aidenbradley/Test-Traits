@@ -13,7 +13,10 @@ trait InstallsExportedConfig
         InstallsImageStyles,
         InstallsRoles,
         InstallsVocabularies,
-        InstallsEntityTypes;
+        InstallsEntityTypes,
+        InstallsViews,
+        InstallsBlocks,
+        InstallsMenus;
 
     /** @var string */
     private $useVfsConfigDirectory = false;
