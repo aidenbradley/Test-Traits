@@ -39,7 +39,7 @@ class InstallsBlocksTest extends KernelTestBase
     }
 
     /** @test */
-    public function installs_single_block(): void
+    public function install_single_block(): void
     {
         $this->enableModules([
             'block',
@@ -56,13 +56,11 @@ class InstallsBlocksTest extends KernelTestBase
 
         $this->assertNotEmpty($blocks);
 
-        $sevenBrandingBlock = reset($blocks);
-
-        $this->assertEquals('seven_branding', $sevenBrandingBlock->id());
+        $this->assertInstanceOf(Block::class, $blockStorage->load('seven_branding'));
     }
 
     /** @test */
-    public function installs_multiple_blocks(): void
+    public function install_multiple_blocks(): void
     {
         $this->enableModules([
             'block',

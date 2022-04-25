@@ -45,9 +45,7 @@ class InstallsImageStylesTest extends KernelTestBase
 
         $this->assertNotEmpty($imageStyles);
 
-        $largeImageStyle = reset($imageStyles);
-
-        $this->assertEquals('large', $largeImageStyle->id());
+        $this->assertInstanceOf(ImageStyle::class, $imageStyleStorage->load('large'));
     }
 
     /** @test */

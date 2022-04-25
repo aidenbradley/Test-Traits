@@ -55,9 +55,7 @@ class InstallsViewsTest extends KernelTestBase
 
         $this->assertNotEmpty($views);
 
-        $mediaView = reset($views);
-
-        $this->assertEquals('media', $mediaView->id());
+        $this->assertInstanceOf(View::class, $viewStorage->load('media'));
     }
 
     /** @test */

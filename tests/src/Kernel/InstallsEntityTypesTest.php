@@ -40,9 +40,7 @@ class InstallsEntityTypesTest extends KernelTestBase
 
         $this->assertNotEmpty($nodeTypes);
 
-        $pageNodeType = reset($nodeTypes);
-
-        $this->assertEquals('page', $pageNodeType->id());
+        $this->assertInstanceOf(NodeType::class, $nodeTypeStorage->load('page'));
     }
 
     /** @test */

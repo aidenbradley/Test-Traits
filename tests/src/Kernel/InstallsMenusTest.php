@@ -34,7 +34,7 @@ class InstallsMenusTest extends KernelTestBase
     }
 
     /** @test */
-    public function installs_single_menu(): void
+    public function install_single_menu(): void
     {
         $this->enableModules([
             'system',
@@ -51,13 +51,11 @@ class InstallsMenusTest extends KernelTestBase
 
         $this->assertNotEmpty($menus);
 
-        $footer = reset($menus);
-
-        $this->assertEquals('footer', $footer->id());
+        $this->assertInstanceOf(Menu::class, $menuStorage->load('footer'));
     }
 
     /** @test */
-    public function installs_multiple_menus(): void
+    public function install_multiple_menus(): void
     {
         $this->enableModules([
             'system',

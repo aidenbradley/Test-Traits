@@ -34,7 +34,7 @@ class InstallsRolesTest extends KernelTestBase
     }
 
     /** @test */
-    public function installs_single_role(): void
+    public function install_single_role(): void
     {
         $this->enableModules([
             'system',
@@ -58,7 +58,7 @@ class InstallsRolesTest extends KernelTestBase
     }
 
     /** @test */
-    public function installs_multiple_roles(): void
+    public function install_multiple_roles(): void
     {
         $this->enableModules([
             'system',
