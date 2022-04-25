@@ -24,7 +24,7 @@ trait InstallsExportedConfig
     private $customConfigDirectory;
 
     /** @var array */
-    protected $installedConfig = [];
+    private $installedConfig = [];
 
     /** @param string|array $config */
     public function installExportedConfig($config): self
