@@ -1,6 +1,10 @@
 {
     "require-dev": {
         "illuminate/collections": "^8.77",
-        "opis/closure": "^3.6"
+        "opis/closure": "^3.6",
+        "phpstan/phpstan-deprecation-rules": "^1.0"
+    },
+    "require": {
+        "mglaman/phpstan-drupal": "^1.1"
     }
 }
