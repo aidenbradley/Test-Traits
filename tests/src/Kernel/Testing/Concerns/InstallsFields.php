@@ -43,14 +43,14 @@ trait InstallsFields
         }, $configStorage->listAll('field.storage.' . $entityType)), $entityType, $bundle);
     }
 
-    private function setupDependencies(): void
+    private function setupDependencies(): self
     {
-        if ($this->setupDependencies) {
-            return;
+        if ($this->setupDependencies === false) {
+            $this->enableModules(['field']);
         }
 
-        $this->enableModules(['field']);
-
         $this->setupDependencies = true;
+
+        return $this;
     }
 }

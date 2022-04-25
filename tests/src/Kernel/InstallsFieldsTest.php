@@ -24,6 +24,38 @@ class InstallsFieldsTest extends KernelTestBase
     }
 
     /** @test */
+    public function installing_field_sets_up_dependencies(): void
+    {
+        $this->assertFalse($this->container->get('module_handler')->moduleExists('field'));
+
+        $this->enableModules([
+            'text',
+        ]);
+
+        $this->setConfigDirectory(__DIR__ . '/__fixtures__/config/sync/node/bundles');
+        $this->installBundles('node', 'page');
+
+        $this->setConfigDirectory(__DIR__ . '/__fixtures__/config/sync/node/fields');
+
+        $nodeStorage = $this->container->get('entity_type.manager')->getStorage('node');
+
+        $node = $nodeStorage->create([
+            'nid' => 1,
+            'type' => 'page',
+            'title' => 'Node',
+        ]);
+        $node->save();
+
+        $this->installField('body', 'node', 'page');
+
+        $node = $nodeStorage->load(1);
+
+        $this->assertTrue($node->hasField('body'));
+
+        $this->assertTrue($this->container->get('module_handler')->moduleExists('field'));
+    }
+
+    /** @test */
     public function install_single_field(): void
     {
         $this->enableModules([
