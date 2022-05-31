@@ -3,9 +3,8 @@
 namespace Drupal\Tests\test_traits\Kernel\Testing\Concerns;
 
 use Drupal\Core\Config\FileStorage;
-use Drupal\Core\Site\Settings;
 use Drupal\Tests\test_traits\Kernel\Testing\Exceptions\ConfigInstallFailed;
-use Symfony\Component\Finder\Finder;
+use Drupal\Tests\test_traits\Kernel\Testing\Util\ConfigurationDiscovery;
 
 trait InstallsExportedConfig
 {
@@ -58,59 +57,17 @@ trait InstallsExportedConfig
 
     protected function configDirectory(): string
     {
-        $root = $this->container->get('app.root');
-
-        $settings = [];
-
-        $currentErrorReportingLevel = error_reporting();
-
-        error_reporting(E_ALL & ~E_NOTICE);
-
-        require $root . '/sites/default/settings.php';
-
-        error_reporting($currentErrorReportingLevel);
-
-        dump($settings);
-
-//        if (str_contains($root, 'web') !== false) {
-//            $root = str_replace('/web', '', $root);
+//        if ($this->useVfsConfigDirectory) {
+//            return Settings::get('config_sync_directory');
+//        }
+//
+//        if ($this->customConfigDirectory) {
+//            return '/' . ltrim($this->customConfigDirectory, '/');
 //        }
 
-//        $settingsContents = file_get_contents($root . '/sites/default/settings.php');
-//        $settingsContents = preg_replace('/[\r\n]+/', "\n", $settingsContents);
-//        $strippedContents = preg_replace('/[ \t]+/', ' ', $settingsContents);
-//
-//        foreach (explode('$', $strippedContents) as $setting) {
-//            if (str_contains($setting, 'config_sync_directory') === false) {
-//                continue;
-//            }
-//
-//            $configDirectory = trim(explode('=', $setting)[1]);
-//        }
-
-        $configDirectory = Finder::create()
-            ->ignoreDotFiles(true)
-            ->ignoreUnreadableDirs()
-            ->directories()
-            ->in($root)
-            ->depth(0);
-
-        /** @var \Symfony\Component\Finder\SplFileInfo $directory */
-        foreach ($configDirectory as $directory) {
-            dump(__METHOD__, $directory->getPathname());
-        }
-
-        if ($this->useVfsConfigDirectory) {
-            return Settings::get('config_sync_directory');
-        }
-
-        if ($this->customConfigDirectory) {
-            return '/' . ltrim($this->customConfigDirectory, '/');
-        }
-
-        $root = $this->container->get('app.root');
-
-        return str_replace('web/', '', $root . '/config/sync');
+        return ConfigurationDiscovery::createFromAppRoot(
+            $this->container->get('app.root')
+        )->getConfigurationDirectory();
     }
 
     /** sets the config directory relative to the __fixtures__ directory */

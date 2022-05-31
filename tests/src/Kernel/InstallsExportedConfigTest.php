@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\test_traits\Kernel;
 
+use Drupal\Core\Site\Settings;
 use Drupal\image\Entity\ImageStyle;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\node\Entity\NodeType;
