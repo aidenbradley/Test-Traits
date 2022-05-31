@@ -22,17 +22,13 @@ class ConfigurationDiscovery
 
     public function getConfigurationDirectory(): string
     {
-        return '';
+        $root = $this->appRoot;
 
-        $settings = [];
+        $settings = $this->temporarilyIgnoreErrors(function() {
+           return $this->getSiteSettings();
+        });
 
-        $currentErrorReportingLevel = error_reporting();
-
-        error_reporting(E_ALL & ~E_NOTICE);
-
-        require $this->appRoot . $this->settingsLocation;
-
-        error_reporting($currentErrorReportingLevel);
+        dump($settings);
 
         $configDirectory = $settings['config_sync_directory'];
 
@@ -47,5 +43,28 @@ class ConfigurationDiscovery
         }
 
         return $root . '/' . ltrim($configDirectory, '/');
+    }
+
+    /** @return mixed */
+    private function temporarilyIgnoreErrors(callable $callback)
+    {
+        $currentErrorReportingLevel = error_reporting();
+
+        error_reporting(E_ALL & ~E_NOTICE);
+
+        $result = $callback();
+
+        error_reporting($currentErrorReportingLevel);
+
+        return $result;
+    }
+
+    private function getSiteSettings(): array
+    {
+        $settings = [];
+
+        require $this->appRoot . '/' . ltrim($this->settingsLocation, '/');
+
+        return $settings;
     }
 }
