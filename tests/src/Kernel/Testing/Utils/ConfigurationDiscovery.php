@@ -1,11 +1,14 @@
 <?php
 
-namespace Drupal\Tests\test_traits\Kernel\Testing\Util;
+namespace Drupal\Tests\test_traits\Kernel\Testing\Utils;
 
 class ConfigurationDiscovery
 {
     /** @var string */
     private $appRoot;
+
+    /** @var string */
+    private $settingsLocation = '/sites/default/settings.php';
 
     public static function createFromAppRoot(string $appRoot): self
     {
@@ -27,7 +30,7 @@ class ConfigurationDiscovery
 
         error_reporting(E_ALL & ~E_NOTICE);
 
-        require $root . '/sites/default/settings.php';
+        require $this->appRoot . $this->settingsLocation;
 
         error_reporting($currentErrorReportingLevel);
 
