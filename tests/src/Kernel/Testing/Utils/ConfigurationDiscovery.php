@@ -2,6 +2,8 @@
 
 namespace Drupal\Tests\test_traits\Kernel\Testing\Utils;
 
+use Drupal\Tests\test_traits\Kernel\Testing\Exceptions\ConfigInstallFailed;
+
 class ConfigurationDiscovery
 {
     /** @var string */
@@ -28,11 +30,9 @@ class ConfigurationDiscovery
            return $this->getSiteSettings();
         });
 
-        dump($settings);
-
         $configDirectory = $settings['config_sync_directory'];
 
-        if(str_contains($settings['config_sync_directory'], '../')) {
+        if($this->configOutsideDocroot($settings)) {
             $rootParts = explode('/', $root);
 
             unset($rootParts[count($rootParts) - 1]);
@@ -43,6 +43,15 @@ class ConfigurationDiscovery
         }
 
         return $root . '/' . ltrim($configDirectory, '/');
+    }
+
+    private function configOutsideDocroot(array $settings): bool
+    {
+        if (isset($settings['config_sync_directory']) === false) {
+            throw ConfigInstallFailed::directoryDoesNotExist();
+        }
+
+        return str_contains($settings['config_sync_directory'], '../') !== false;
     }
 
     /** @return mixed */

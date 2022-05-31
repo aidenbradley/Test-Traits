@@ -4,7 +4,9 @@ namespace Drupal\Tests\test_traits\Kernel\Testing\Exceptions;
 
 class ConfigInstallFailed extends \Exception
 {
-    public const CONFIGURATION_DOES_NOT_EXIST = 1;
+    private const CONFIGURATION_DOES_NOT_EXIST = 1;
+
+    private const DIRECTORY_DOES_NOT_EXIST = 2;
 
     /** @var string */
     private $failingConfigFile = '';
@@ -18,6 +20,15 @@ class ConfigInstallFailed extends \Exception
         );
 
         return $exception->setFailingConfigFile($configFile);
+    }
+
+    /** @return static */
+    public static function directoryDoesNotExist()
+    {
+        return new static(
+            'The `config_sync_directory` setting does not exist',
+            self::DIRECTORY_DOES_NOT_EXIST
+        );
     }
 
     public function getFailingConfigFile(): string
