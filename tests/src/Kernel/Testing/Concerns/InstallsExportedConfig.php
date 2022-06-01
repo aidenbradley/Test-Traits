@@ -5,6 +5,7 @@ namespace Drupal\Tests\test_traits\Kernel\Testing\Concerns;
 use Drupal\Core\Config\FileStorage;
 use Drupal\Core\Site\Settings;
 use Drupal\Tests\test_traits\Kernel\Testing\Exceptions\ConfigInstallFailed;
+use Drupal\Tests\test_traits\Kernel\Testing\Utils\ConfigurationDiscovery;
 
 trait InstallsExportedConfig
 {
@@ -65,9 +66,9 @@ trait InstallsExportedConfig
             return '/' . ltrim($this->customConfigDirectory, '/');
         }
 
-        $root = $this->container->get('app.root');
-
-        return str_replace('web/', '', $root . '/config/sync');
+        return ConfigurationDiscovery::createFromAppRoot(
+            $this->container->get('app.root')
+        )->getConfigurationDirectory();
     }
 
     /** sets the config directory relative to the __fixtures__ directory */

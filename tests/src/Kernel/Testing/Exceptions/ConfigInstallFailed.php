@@ -9,10 +9,9 @@ class ConfigInstallFailed extends \Exception
     /** @var string */
     private $failingConfigFile = '';
 
-    /** @return static */
-    public static function doesNotExist(string $configFile)
+    public static function doesNotExist(string $configFile): self
     {
-        $exception = new static(
+        $exception = new self(
             'Configuration file ' . $configFile . ' does not exist',
             self::CONFIGURATION_DOES_NOT_EXIST
         );
