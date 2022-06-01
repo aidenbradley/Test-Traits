@@ -42,6 +42,7 @@ class ConfigurationDiscovery
         return Settings::create($settings);
     }
 
+    /** Added method incase the location of settings.php changes in future drupal versions */
     private function loadSettingsFromFinder(): array
     {
         $settings = [];
