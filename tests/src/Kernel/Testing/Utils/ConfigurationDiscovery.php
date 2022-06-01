@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\test_traits\Kernel\Testing\Utils;
 
+use Drupal\Core\Site\Settings;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
@@ -33,13 +34,13 @@ class ConfigurationDiscovery
         return $this->appRoot . '/' . ltrim($settings->get('config_sync_directory'), '/');
     }
 
-    private function loadSettings(): Settings
+    private function loadSettings()
     {
         $settings = [];
 
         require $this->appRoot . '/' . ltrim($this->settingsLocation, '/');
 
-        return Settings::create($settings);
+        return new Settings($settings);
     }
 
     /** Added method incase the location of settings.php changes in future drupal versions */
