@@ -2,8 +2,6 @@
 
 namespace Drupal\Tests\test_traits\Kernel\Testing\Utils;
 
-use Drupal\Tests\test_traits\Kernel\Testing\Exceptions\ConfigInstallFailed;
-
 class ConfigurationDiscovery
 {
     /** @var string */
