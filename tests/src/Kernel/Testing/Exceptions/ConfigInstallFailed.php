@@ -23,10 +23,10 @@ class ConfigInstallFailed extends \Exception
     }
 
     /** @return static */
-    public static function directoryDoesNotExist()
+    public static function directoryDoesNotExist(string $settingsFileLocation)
     {
         return new static(
-            'The `config_sync_directory` setting does not exist',
+            'The `config_sync_directory` setting does not exist in ' . $settingsFileLocation,
             self::DIRECTORY_DOES_NOT_EXIST
         );
     }

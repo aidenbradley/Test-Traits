@@ -10,7 +10,7 @@ class Settings
     private $settingsLocation = '/sites/default/settings.php';
 
     /** @var array */
-    private $siteSettings;
+    private $siteSettings = [];
 
     public static function create(string $appRoot): self
     {
@@ -20,7 +20,7 @@ class Settings
     public function configOutsideDocroot(): bool
     {
         if (isset($this->siteSettings['config_sync_directory']) === false) {
-            throw ConfigInstallFailed::directoryDoesNotExist();
+            throw ConfigInstallFailed::directoryDoesNotExist($this->settingsLocation);
         }
 
         return str_contains($this->siteSettings['config_sync_directory'], '../') !== false;
