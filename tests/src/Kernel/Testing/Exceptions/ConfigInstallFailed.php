@@ -4,9 +4,9 @@ namespace Drupal\Tests\test_traits\Kernel\Testing\Exceptions;
 
 class ConfigInstallFailed extends \Exception
 {
-    private const CONFIGURATION_DOES_NOT_EXIST = 1;
+    public const CONFIGURATION_DOES_NOT_EXIST = 1;
 
-    private const DIRECTORY_DOES_NOT_EXIST = 2;
+    public const DIRECTORY_DOES_NOT_EXIST = 2;
 
     /** @var string */
     private $failingConfigFile = '';
