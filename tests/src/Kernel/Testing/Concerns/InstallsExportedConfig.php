@@ -41,14 +41,14 @@ trait InstallsExportedConfig
 
             $configRecord = $configStorage->read($configName);
 
-            $entityType = $this->container->get('config.manager')->getEntityTypeIdByName($configName);
-
-            /** @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface $storage */
-            $storage = $this->container->get('entity_type.manager')->getStorage($entityType);
-
             if (is_array($configRecord) === false) {
                 throw ConfigInstallFailed::doesNotExist($configName);
             }
+
+            /** @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface $storage */
+            $storage = $this->container->get('entity_type.manager')->getStorage(
+                $this->container->get('config.manager')->getEntityTypeIdByName($configName)
+            );
 
             $storage->createFromStorageRecord($configRecord)->save();
         }
