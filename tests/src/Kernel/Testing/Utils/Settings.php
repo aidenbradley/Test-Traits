@@ -19,13 +19,8 @@ class Settings
         $this->settings = $settings;
     }
 
-    public function getConfigSyncDirectory(): string
-    {
-        return ltrim($this->getSetting('config_sync_directory'), '/');
-    }
-
     /** @return mixed */
-    private function getSetting(string $setting)
+    public function get(string $setting)
     {
         if (isset($this->settings[$setting]) === false) {
             throw SettingsFailed::settingsDoesNotExist($setting);

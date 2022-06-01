@@ -30,7 +30,7 @@ class ConfigurationDiscovery
             return $this->loadSettings();
         });
 
-        return $this->appRoot . '/' . $settings->getConfigSyncDirectory();
+        return $this->appRoot . '/' . ltrim($settings->get('config_sync_directory'), '/');
     }
 
     private function loadSettings(): Settings
