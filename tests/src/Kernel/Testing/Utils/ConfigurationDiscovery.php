@@ -2,6 +2,9 @@
 
 namespace Drupal\Tests\test_traits\Kernel\Testing\Utils;
 
+use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
+
 class ConfigurationDiscovery
 {
     /** @var string */
@@ -45,6 +48,26 @@ class ConfigurationDiscovery
         require $this->appRoot . '/' . ltrim($this->settingsLocation, '/');
 
         return Settings::create($settings);
+    }
+
+    private function loadSettingsFromFinder(): array
+    {
+        $settings = [];
+
+        $finder = Finder::create()
+            ->ignoreUnreadableDirs()
+            ->ignoreDotFiles(true)
+            ->name('settings.php')
+            ->filter(function(SplFileInfo $file) {
+                return str_contains($file->getPathname(), 'simpletest') === false;
+            })
+            ->in($this->appRoot);
+
+        foreach ($finder as $directory) {
+            require $directory->getPathname();
+        }
+
+        return $settings;
     }
 
     /** @return mixed */
