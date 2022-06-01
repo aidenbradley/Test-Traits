@@ -19,9 +19,9 @@ class Settings
         $this->settings = $settings;
     }
 
-    public function configOutsideDocroot(): bool
+    public function getConfigSyncDirectory(): string
     {
-        return str_contains($this->getSetting('config_sync_directory'), '../') !== false;
+        return ltrim($this->getSetting('config_sync_directory'), '/');
     }
 
     /** @return mixed */
@@ -32,12 +32,5 @@ class Settings
         }
 
         return $this->settings[$setting];
-    }
-
-    public function getConfigSyncDirectory(): string
-    {
-        $strippedDirectoryLocation = str_replace('../', '', $this->getSetting('config_sync_directory'));
-
-        return ltrim($strippedDirectoryLocation, '/');
     }
 }

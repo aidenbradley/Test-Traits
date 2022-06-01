@@ -30,15 +30,7 @@ class ConfigurationDiscovery
             return $this->loadSettings();
         });
 
-        $root = $this->when($settings->configOutsideDocroot(), function() {
-            $rootParts = explode('/', $this->appRoot);
-
-            unset($rootParts[count($rootParts) - 1]);
-
-            return implode('/', $rootParts);
-        }, $this->appRoot);
-
-        return $root . '/' . $settings->getConfigSyncDirectory();
+        return $this->appRoot . '/' . $settings->getConfigSyncDirectory();
     }
 
     private function loadSettings(): Settings
@@ -82,19 +74,5 @@ class ConfigurationDiscovery
         error_reporting($currentErrorReportingLevel);
 
         return $result;
-    }
-
-    /**
-     * @param mixed $value
-     * @param mixed $default
-     * @return $this|mixed
-     */
-    public function when($value, callable $callback, $default = null)
-    {
-        if ($value) {
-            return $callback($value);
-        }
-
-        return $default;
     }
 }
