@@ -25,8 +25,10 @@ class ConfigurationDiscovery
            return Settings::create($this->appRoot);
         });
 
+        $root = $this->appRoot;
+
         if($settings->configOutsideDocroot()) {
-            $rootParts = explode('/', $this->appRoot);
+            $rootParts = explode('/', $root);
 
             unset($rootParts[count($rootParts) - 1]);
 
