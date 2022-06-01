@@ -2,50 +2,42 @@
 
 namespace Drupal\Tests\test_traits\Kernel\Testing\Utils;
 
-use Drupal\Tests\test_traits\Kernel\Testing\Exceptions\ConfigInstallFailed;
+use Drupal\Tests\test_traits\Kernel\Testing\Exceptions\SettingsFailed;
 
 class Settings
 {
-    /** @var string */
-    private $settingsLocation = '/sites/default/settings.php';
-
     /** @var array */
-    private $siteSettings = [];
+    private $settings = [];
 
-    public static function create(string $appRoot): self
+    public static function create(array $settings): self
     {
-        return (new self())->setSettings($appRoot);
+        return new self($settings);
+    }
+
+    public function __construct(array $settings)
+    {
+        $this->settings = $settings;
     }
 
     public function configOutsideDocroot(): bool
     {
-        if (isset($this->siteSettings['config_sync_directory']) === false) {
-            throw ConfigInstallFailed::directoryDoesNotExist($this->settingsLocation);
-        }
-
-        return str_contains($this->siteSettings['config_sync_directory'], '../') !== false;
+        return str_contains($this->getSetting('config_sync_directory'), '../') !== false;
     }
 
-    public function getSettings(): array
+    /** @return mixed */
+    private function getSetting(string $setting)
     {
-        return $this->siteSettings;
+        if (isset($this->settings[$setting]) === false) {
+            throw SettingsFailed::settingsDoesNotExist($setting);
+        }
+
+        return $this->settings[$setting];
     }
 
     public function getConfigSyncDirectory(): string
     {
-        $strippedDirectoryLocation = str_replace('../', '', $this->siteSettings['config_sync_directory']);
+        $strippedDirectoryLocation = str_replace('../', '', $this->getSetting('config_sync_directory'));
 
         return ltrim($strippedDirectoryLocation, '/');
-    }
-
-    private function setSettings(string $appRoot): self
-    {
-        $settings = [];
-
-        require $appRoot . '/' . ltrim($this->settingsLocation, '/');
-
-        $this->siteSettings = $settings;
-
-        return $this;
     }
 }

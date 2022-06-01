@@ -3,6 +3,7 @@
 namespace Drupal\Tests\test_traits\Kernel\Testing\Concerns;
 
 use Drupal\Core\Config\FileStorage;
+use Drupal\Core\Site\Settings;
 use Drupal\Tests\test_traits\Kernel\Testing\Exceptions\ConfigInstallFailed;
 use Drupal\Tests\test_traits\Kernel\Testing\Utils\ConfigurationDiscovery;
 
@@ -57,13 +58,13 @@ trait InstallsExportedConfig
 
     protected function configDirectory(): string
     {
-//        if ($this->useVfsConfigDirectory) {
-//            return Settings::get('config_sync_directory');
-//        }
-//
-//        if ($this->customConfigDirectory) {
-//            return '/' . ltrim($this->customConfigDirectory, '/');
-//        }
+        if ($this->useVfsConfigDirectory) {
+            return Settings::get('config_sync_directory');
+        }
+
+        if ($this->customConfigDirectory) {
+            return '/' . ltrim($this->customConfigDirectory, '/');
+        }
 
         return ConfigurationDiscovery::createFromAppRoot(
             $this->container->get('app.root')
