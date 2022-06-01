@@ -17,17 +17,22 @@ class ConfigurationDiscoveryTest extends KernelTestBase
     }
 
     /** @test */
-    public function loads_in_settings_without_php_errors(): void
+    public function supresses_errors_when_requiring_settings(): void
     {
-        $this->markTestIncomplete('Need to figure out how this test is going to work');
+        $this->container->set('app.root', __DIR__);
 
         $configurationDiscovery = ConfigurationDiscovery::createFromAppRoot(
             $this->container->get('app.root')
         );
 
-//        (function() {
-//            $this->settingsLocation = '../__fixtures__/settings/fixture.settings.php';
-//        })->call($configurationDiscovery);
+        (function() {
+            $this->settingsLocation = '../__fixtures__/settings/fixture.settings.php';
+        })->call($configurationDiscovery);
+
+        $this->assertEquals(
+            $this->container->get('app.root') . '/test/config/directory',
+            $configurationDiscovery->getConfigurationDirectory()
+        );
     }
 
     /** @test */
