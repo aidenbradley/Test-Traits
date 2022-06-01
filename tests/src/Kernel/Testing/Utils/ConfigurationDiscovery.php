@@ -9,9 +9,6 @@ class ConfigurationDiscovery
     /** @var string */
     private $appRoot;
 
-    /** @var string */
-    private $settingsLocation = '/sites/default/settings.php';
-
     public static function createFromAppRoot(string $appRoot): self
     {
         return new self($appRoot);
@@ -24,34 +21,19 @@ class ConfigurationDiscovery
 
     public function getConfigurationDirectory(): string
     {
-        $root = $this->appRoot;
-
         $settings = $this->temporarilyIgnoreErrors(function() {
-           return $this->getSiteSettings();
+           return Settings::create($this->appRoot);
         });
 
-        $configDirectory = $settings['config_sync_directory'];
-
-        if($this->configOutsideDocroot($settings)) {
-            $rootParts = explode('/', $root);
+        if($settings->configOutsideDocroot()) {
+            $rootParts = explode('/', $this->appRoot);
 
             unset($rootParts[count($rootParts) - 1]);
 
             $root = implode('/', $rootParts);
-
-            $configDirectory = str_replace('../', '', $configDirectory);
         }
 
-        return $root . '/' . ltrim($configDirectory, '/');
-    }
-
-    private function configOutsideDocroot(array $settings): bool
-    {
-        if (isset($settings['config_sync_directory']) === false) {
-            throw ConfigInstallFailed::directoryDoesNotExist();
-        }
-
-        return str_contains($settings['config_sync_directory'], '../') !== false;
+        return $root . '/' . $settings->getConfigSyncDirectory();
     }
 
     /** @return mixed */
@@ -66,14 +48,5 @@ class ConfigurationDiscovery
         error_reporting($currentErrorReportingLevel);
 
         return $result;
-    }
-
-    private function getSiteSettings(): array
-    {
-        $settings = [];
-
-        require $this->appRoot . '/' . ltrim($this->settingsLocation, '/');
-
-        return $settings;
     }
 }
