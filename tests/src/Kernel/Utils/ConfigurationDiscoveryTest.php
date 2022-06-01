@@ -34,10 +34,4 @@ class ConfigurationDiscoveryTest extends KernelTestBase
             $configurationDiscovery->getConfigurationDirectory()
         );
     }
-
-    /** @test */
-    public function test(): void
-    {
-
-    }
 }
