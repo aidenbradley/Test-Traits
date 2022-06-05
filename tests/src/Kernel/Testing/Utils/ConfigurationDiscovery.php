@@ -8,6 +8,9 @@ use Symfony\Component\Finder\SplFileInfo;
 
 class ConfigurationDiscovery
 {
+    /** @var bool */
+    public $autoDiscoverConfigDirectory = false;
+
     /** @var string */
     private $appRoot;
 
@@ -28,6 +31,10 @@ class ConfigurationDiscovery
     {
         /** @var Settings $settings */
         $settings = $this->temporarilySupressErrors(function() {
+            if ($this->autoDiscoverConfigDirectory) {
+                return $this->loadSettingsFromFinder();
+            }
+
             return $this->loadSettings();
         });
 

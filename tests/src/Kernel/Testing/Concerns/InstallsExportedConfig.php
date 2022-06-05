@@ -16,7 +16,8 @@ trait InstallsExportedConfig
         InstallsEntityTypes,
         InstallsViews,
         InstallsBlocks,
-        InstallsMenus;
+        InstallsMenus,
+        InteractsWithSettings;
 
     /** @var string */
     private $useVfsConfigDirectory = false;
@@ -66,9 +67,7 @@ trait InstallsExportedConfig
             return '/' . ltrim($this->customConfigDirectory, '/');
         }
 
-        return ConfigurationDiscovery::createFromAppRoot(
-            $this->container->get('app.root')
-        )->getConfigurationDirectory();
+        return $this->getConfigurationDirectory();
     }
 
     /** sets the config directory relative to the __fixtures__ directory */
