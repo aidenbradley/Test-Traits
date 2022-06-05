@@ -4,7 +4,6 @@ namespace Drupal\Tests\test_traits\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\test_traits\Kernel\Testing\Concerns\InteractsWithSettings;
-use Drupal\Tests\test_traits\Kernel\Testing\Utils\ConfigurationDiscovery;
 
 class InteractsWithSettingsTest extends KernelTestBase
 {
