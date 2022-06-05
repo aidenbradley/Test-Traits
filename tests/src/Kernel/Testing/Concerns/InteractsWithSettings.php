@@ -3,14 +3,13 @@
 namespace Drupal\Tests\test_traits\Kernel\Testing\Concerns;
 
 use Drupal\Core\Site\Settings;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
 trait InteractsWithSettings
 {
     /** @var bool */
-    public $autoDiscoverConfigDirectory = false;
+    public $autoDiscoverSettings = false;
 
     /** @var string */
     private $settingsLocation = '/sites/default/settings.php';
@@ -25,7 +24,7 @@ trait InteractsWithSettings
         return $this->appRoot() . '/' . ltrim($directory, '/');
     }
 
-    private function getSettings(): Settings
+    protected function getSettings(): Settings
     {
         if (isset($this->settings) === false) {
             $this->temporarilySupressErrors(function() {
@@ -38,7 +37,7 @@ trait InteractsWithSettings
 
     private function loadSettings(): void
     {
-        if ($this->autoDiscoverConfigDirectory) {
+        if ($this->autoDiscoverSettings) {
             $this->settings = new Settings($this->loadSettingsFromFinder());
 
             return;

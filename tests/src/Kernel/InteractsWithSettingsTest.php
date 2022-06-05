@@ -9,7 +9,12 @@ class InteractsWithSettingsTest extends KernelTestBase
 {
     use InteractsWithSettings;
 
-    /** @test */
+    /**
+     * @test
+     *
+     * "fixture.settings.php" contains a variable not defined in scope when it's loaded in.
+     *
+     */
     public function supresses_errors_when_requiring_settings(): void
     {
         $this->container->set('app.root', __DIR__);
@@ -21,9 +26,19 @@ class InteractsWithSettingsTest extends KernelTestBase
         );
     }
 
-    /** @test */
-    public function auto_discover_config_directory(): void
+    /**
+     * @test
+     *
+     * "auto_discovered" is a setting set at /Kernel/__fixtures__/settings/auto_discover/settings.php
+     */
+    public function auto_discovers_settings(): void
     {
-        $this->autoDiscoverConfigDirectory = true;
+        $this->assertNull($this->getSettings()->get('auto_discovered'));
+
+        // force InteractsWithSettings to find the settings but using finder this time
+        $this->settings = null;
+        $this->autoDiscoverSettings = true;
+
+        $this->assertTrue($this->getSettings()->get('auto_discovered'));
     }
 }
