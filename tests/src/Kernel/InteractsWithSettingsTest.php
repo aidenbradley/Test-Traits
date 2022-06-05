@@ -34,7 +34,8 @@ class InteractsWithSettingsTest extends KernelTestBase
     {
         $this->assertNull($this->getSettings()->get('auto_discovered'));
 
-        // force InteractsWithSettings to find the settings but using finder this time
+        // force InteractsWithSettings to find settings.php again
+        // this time using finder to load in other settings
         $this->settings = null;
         $this->autoDiscoverSettings = true;
 
