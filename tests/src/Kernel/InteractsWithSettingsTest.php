@@ -13,7 +13,6 @@ class InteractsWithSettingsTest extends KernelTestBase
      * @test
      *
      * "fixture.settings.php" contains a variable not defined in scope when it's loaded in.
-     *
      */
     public function supresses_errors_when_requiring_settings(): void
     {
