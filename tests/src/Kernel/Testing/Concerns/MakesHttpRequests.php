@@ -15,7 +15,7 @@ trait MakesHttpRequests
     private $response;
 
     /** @var bool */
-    private $followRedirects;
+    private $followRedirects = false;
 
     /** @var null|bool */
     private $requestIsAjax = null;
