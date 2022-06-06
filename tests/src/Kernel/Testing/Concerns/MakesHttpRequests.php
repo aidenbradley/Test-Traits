@@ -8,12 +8,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 trait MakesHttpRequests
 {
-    /** @var Request */
-    private $request;
-
-    /** @var \Symfony\Contracts\HttpClient\ResponseInterface */
-    private $response;
-
     /** @var bool */
     private $followRedirects = false;
 
